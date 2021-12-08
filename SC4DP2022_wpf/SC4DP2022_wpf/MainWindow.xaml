@@ -40,10 +40,11 @@
 				 VerticalAlignment="Top"
 				 Width="169"
 				 TextAlignment="Right" />
-		<ListBox x:Name="listBox"
+		<ListBox x:Name="list_Folders"
 				 Margin="28,75,0,158"
 				 HorizontalAlignment="Left"
-				 Width="354" />
+				 Width="354"
+				 SelectionMode="Multiple" />
 
 	</Grid>
 </Window>

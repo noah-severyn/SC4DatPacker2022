@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,15 +30,33 @@ namespace SC4DP2022_wpf {
 
 		private void btn_Browse_Click(object sender, RoutedEventArgs e) {
 			string user = Environment.UserName;
+			string path = "C:\\Users\\" + user + "\\Documents\\SimCity 4\\Plugins";
 
 			// Folder picker dialog box
 			// https://stackoverflow.com/a/41511598
 			CommonOpenFileDialog dialog = new CommonOpenFileDialog();
-			dialog.InitialDirectory = "C:\\Users\\" + user + "\\Documents\\SimCity 4\\Plugins";
+			dialog.InitialDirectory = path;
 			dialog.IsFolderPicker = true;
 			if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
-				MessageBox.Show("You selected: " + dialog.FileName);
+				//MessageBox.Show("You selected: " + dialog.FileName);
 				txt_CurrentDirectory.Text = dialog.FileName;
+				path = dialog.FileName;
+			}
+
+			FillFolderList(path);
+		}
+
+
+
+		/// <summary>
+		/// Lists all folders in the specified path in list_Folders listBox
+		/// </summary>
+		/// <param name="path"></param>
+		private void FillFolderList(string path) {
+			string[] folders = Directory.GetDirectories(path);
+
+			foreach (string dir in folders) {
+				list_Folders.Items.Add(dir.Substring(dir.LastIndexOf("\\") + 1));
 			}
 		}
 	}
