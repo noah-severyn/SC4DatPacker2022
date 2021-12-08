@@ -20,30 +20,33 @@ namespace SC4DP2022_wpf {
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	public partial class MainWindow : Window {
+		private string activeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SimCity 4\\Plugins";
+		private string destinationDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SimCity 4\\Plugins\\Plugins_Compressed";
+
 		public MainWindow() {
 			InitializeComponent();
 
-			// Set default folder to SC4 plugins on startup
-			string user = Environment.UserName;
-			txt_CurrentDirectory.Text = "C:\\Users\\" + user + "\\Documents\\SimCity 4\\Plugins";
+			// Set default folders on startup + fill listbox with items in default folder
+			SourceDirectory.Text = activeDirectory;
+			DestinationDirectory.Text = destinationDirectory;
+			FillFolderList(activeDirectory);
 		}
 
-		private void btn_Browse_Click(object sender, RoutedEventArgs e) {
-			string user = Environment.UserName;
-			string path = "C:\\Users\\" + user + "\\Documents\\SimCity 4\\Plugins";
+		private void BrowseSourceDirectory_Click(object sender, RoutedEventArgs e) {
 
 			// Folder picker dialog box
 			// https://stackoverflow.com/a/41511598
-			CommonOpenFileDialog dialog = new CommonOpenFileDialog();
-			dialog.InitialDirectory = path;
-			dialog.IsFolderPicker = true;
+			CommonOpenFileDialog dialog = new CommonOpenFileDialog {
+				InitialDirectory = activeDirectory,
+				IsFolderPicker = true
+			};
 			if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
 				//MessageBox.Show("You selected: " + dialog.FileName);
-				txt_CurrentDirectory.Text = dialog.FileName;
-				path = dialog.FileName;
+				SourceDirectory.Text = dialog.FileName;
+				activeDirectory = dialog.FileName;
 			}
 
-			FillFolderList(path);
+			FillFolderList(activeDirectory);
 		}
 
 
@@ -55,9 +58,17 @@ namespace SC4DP2022_wpf {
 		private void FillFolderList(string path) {
 			string[] folders = Directory.GetDirectories(path);
 
+			// Remove all existing list items
+
+
+			// Add the new list items
 			foreach (string dir in folders) {
 				list_Folders.Items.Add(dir.Substring(dir.LastIndexOf("\\") + 1));
 			}
+		}
+
+		private void BrowseDestinationDirectory_Click(object sender, RoutedEventArgs e) {
+
 		}
 	}
 }
