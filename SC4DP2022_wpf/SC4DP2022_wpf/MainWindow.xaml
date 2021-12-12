@@ -15,7 +15,7 @@
 			<RowDefinition Height="30" />
 			<RowDefinition Height="30" />
 			<RowDefinition />
-			<RowDefinition />
+			<RowDefinition Height="100" />
 		</Grid.RowDefinitions>
 
 		<Label x:Name="lbl_SourceDirectory"
@@ -68,9 +68,31 @@
 				Click="BrowseDestinationDirectory_Click" />
 		<ListBox x:Name="FolderList"
 				 Grid.Row="2"
-				 Margin="10,6,10,0"
-				 VerticalAlignment="Top"
-				 SelectionMode="Multiple"
-				 Height="221" />
+				 Margin="10,6,10,10"
+				 SelectionMode="Multiple" />
+		<Button x:Name="Pack"
+				Grid.Row="3"
+				Content="Pack"
+				Margin="43,6,0,0"
+				HorizontalAlignment="Left"
+				VerticalAlignment="Top"
+				Width="80"
+				Click="Pack_Click" />
+		<Button x:Name="Quit"
+				Grid.Row="3"
+				Content="Quit"
+				HorizontalAlignment="Center"
+				Margin="0,6,0,0"
+				VerticalAlignment="Top"
+				Width="78"
+				Click="Quit_Click" />
+		<TextBlock x:Name="lbl_Version"
+				   Margin="0,0,70,36"
+				   Grid.Row="3"
+				   Text="Get most recent version"
+				   HorizontalAlignment="Right"
+				   Width="218"
+				   Height="17"
+				   VerticalAlignment="Bottom" />
 	</Grid>
 </Window>
