@@ -8,7 +8,7 @@
 		Title="SC4 DatPacker 2022"
 		Height="550"
 		Width="400"
-		MinHeight="300"
+		MinHeight="350"
 		MinWidth="250">
 	<Grid>
 		<Grid.RowDefinitions>
