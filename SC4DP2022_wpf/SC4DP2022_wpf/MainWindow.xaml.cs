@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using System.IO; //required for GetDirectories, GetFiles
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Microsoft.WindowsAPICodePack.Dialogs;
+using Microsoft.WindowsAPICodePack.Dialogs; //required for the folder selection dialogs;
 
 namespace SC4DP2022_wpf {
 	/// <summary>
@@ -112,21 +112,26 @@ namespace SC4DP2022_wpf {
 			System.Diagnostics.Debug.WriteLine("more than zero items selected. continuing...");
 
 
-
-			List<string> allFoldersToSearch = new List<string>();
+			//generate list of files from selected folders
+			List<string> sc4Files = new List<string>();
+			List<string> skippedFiles = new List<string>(); // TODO: implement this
+			SearchOption so;
 			foreach (string folder in FolderList.SelectedItems) {
-				allFoldersToSearch.Add(activeDirectoryPath + "\\" + folder);
-				System.Diagnostics.Debug.WriteLine("root folder added: " + activeDirectoryPath + "\\" + folder);
 
-				//get list of each sub folder inside the selected folder
-				string[] subfolders = Directory.GetDirectories(activeDirectoryPath + "\\" + folder, "*", SearchOption.AllDirectories);
-				//loop over the list of subfolders and add them to the master search list
-				foreach (string subfolder in subfolders) {
-					allFoldersToSearch.Add(subfolder);
-					System.Diagnostics.Debug.WriteLine("subfolder added: " + subfolder);
+				if (resurseIntoSubfolders) {
+					so = SearchOption.AllDirectories;
+				} else {
+					so = SearchOption.TopDirectoryOnly;
+				}
+
+				//list all files in the current root folder
+				string[] files = Directory.GetFiles(activeDirectoryPath + "\\" + folder, "*", so);
+				//loop over the list of files and add them to the master file list
+				foreach (string file in files) {
+					sc4Files.Add(file);
+					System.Diagnostics.Debug.WriteLine("file added: " + file);
 				}
 			}
-
 		}
 
 
