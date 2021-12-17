@@ -16,12 +16,26 @@ namespace SC4DP2022_wpf {
 		private uint majorVersion;
 		public uint HeaderMajorVersion {
 			get { return majorVersion; }
-			set { majorVersion = value; }
+			set {
+				if (value != (uint)1) {
+					throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
+				} else {
+					majorVersion = value;
+				}
+			}
 		}
 		private uint minorVersion;
 		public uint HeaderMinorVersion {
 			get { return minorVersion; }
-			set { minorVersion = value; }
+			set {
+				if (value != (uint) 0) {
+					throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
+				}
+				else {
+					minorVersion = value;
+				}
+				minorVersion = value; 
+			}
 		}
 		private uint dateCreated;
 		public uint HeaderDateCreated {
