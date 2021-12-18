@@ -10,10 +10,18 @@ namespace SC4DP2022_wpf {
 		private static readonly string[] sc4Extensions = { "dat", "sc4lot", "sc4desc", "sc4model" };
 
 		private class DBPFHeader {
-			private char[] identifier;
-			public char[] HeaderIdentifier {
+			private byte[] identifier;
+			public byte[] HeaderIdentifier {
 				get { return identifier; }
-				set { identifier = value; }
+				set {
+					byte[] identifierDbpf = new byte[] { 0x44, 0x42, 0x50, 0x46 };
+					if (!value.SequenceEqual(identifierDbpf)) {
+						throw new Exception("File is not a DBPF file!");
+					}
+					else {
+						identifier = value;
+					}
+				}
 			}
 
 			private uint majorVersion;
@@ -55,10 +63,10 @@ namespace SC4DP2022_wpf {
 				set { dateModified = value; }
 			}
 
-			private uint indexVersion;
-			public uint HeaderIndexVersion {
-				get { return indexVersion; }
-				set { indexVersion = value; }
+			private uint indexMajorVersion;
+			public uint HeaderIndexMajorVersion {
+				get { return indexMajorVersion; }
+				set { indexMajorVersion = value; }
 			}
 
 			private uint indexEntryCount;
@@ -96,32 +104,51 @@ namespace SC4DP2022_wpf {
 				get { return holeSize; }
 				set { holeSize = value; }
 			}
+			
+			private uint indexMinorVersion;
+
+			public uint HeaderIndexMinorVersion {
+				get { return indexMinorVersion; }
+				set { indexMinorVersion = value; }
+			}
 
 
 			// Default Constructor
 			public DBPFHeader() {
+				identifier = new Byte[] { 0x44, 0x42, 0x50, 0x46 }; //DBPF
 				majorVersion = (uint) 1;
 				minorVersion = (uint) 0;
 				dateCreated = (uint) DateTimeOffset.Now.ToUnixTimeSeconds();
 				dateModified = (uint) DateTimeOffset.Now.ToUnixTimeSeconds();
-				indexVersion = (uint) 7;
+				indexMajorVersion = (uint) 7;
 				//indexEntryCount;
 				//indexEntryOffset;
 				//indexSize;
 				holeEntryCount = (uint) 0;
 				holeOffset = (uint) 0;
 				holeSize = (uint) 0;
+				indexMinorVersion = (uint) 0;
 			}
 
 			// Constructor with supplied values
-			public DBPFHeader(byte[] headerByteInfo) {
+			public DBPFHeader(uint[] headerInfo) {
 				//check if input is the proper length of 96 bytes
-				if (headerByteInfo.Length != 96) {
-					throw new Exception($"Incorrect header size supplied to the DBPFHeader class. Provided {headerByteInfo.Length}, expected 96.");
+				if (headerInfo.Length != 18) {
+					throw new Exception($"Incorrect header size supplied to the DBPFHeader class. Provided {headerInfo.Length}, expected 18.");
 				}
-
-
-				//Dictionary<int,uint> 
+				identifier = headerInfo[0];
+				majorVersion = headerInfo[1];
+				minorVersion = headerInfo[2];
+				dateCreated = headerInfo[6];
+				dateModified = headerInfo[7];
+				indexMajorVersion = headerInfo[8];
+				indexEntryCount = headerInfo[9];
+				indexEntryOffset = headerInfo[10];
+				indexSize = headerInfo[11];
+				holeEntryCount = headerInfo[12];
+				holeOffset = headerInfo[13];
+				holeSize = headerInfo[14];
+				indexMinorVersion = headerInfo[15];
 			}
 
 			public override string ToString() {
