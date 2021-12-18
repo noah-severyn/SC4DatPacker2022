@@ -10,12 +10,25 @@ namespace SC4DP2022_wpf {
 		private static readonly string[] sc4Extensions = { "dat", "sc4lot", "sc4desc", "sc4model" };
 
 		private class DBPFHeader {
-			private byte[] identifier;
-			public byte[] HeaderIdentifier {
+			//private byte[] identifier;
+			//public byte[] HeaderIdentifier {
+			//	get { return identifier; }
+			//	set {
+			//		byte[] identifierDbpf = new byte[] { 0x44, 0x42, 0x50, 0x46 };
+			//		if (!value.SequenceEqual(identifierDbpf)) {
+			//			throw new Exception("File is not a DBPF file!");
+			//		}
+			//		else {
+			//			identifier = value;
+			//		}
+			//	}
+			//}
+			private uint identifier;
+			public uint HeaderIdentifier {
 				get { return identifier; }
 				set {
-					byte[] identifierDbpf = new byte[] { 0x44, 0x42, 0x50, 0x46 };
-					if (!value.SequenceEqual(identifierDbpf)) {
+					uint identifierDbpf = (uint) int.Parse("DBPF");
+					if (value.CompareTo(identifierDbpf) != 0) {
 						throw new Exception("File is not a DBPF file!");
 					}
 					else {
@@ -115,7 +128,7 @@ namespace SC4DP2022_wpf {
 
 			// Default Constructor
 			public DBPFHeader() {
-				identifier = new Byte[] { 0x44, 0x42, 0x50, 0x46 }; //DBPF
+				identifier = (uint) int.Parse("DBPF");
 				majorVersion = (uint) 1;
 				minorVersion = (uint) 0;
 				dateCreated = (uint) DateTimeOffset.Now.ToUnixTimeSeconds();
