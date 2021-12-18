@@ -6,82 +6,144 @@ using System.IO;
 using System.Diagnostics;
 
 namespace SC4DP2022_wpf {
-	internal class DBPF {
+	internal class DBPFFile {
 		private static readonly string[] sc4Extensions = { "dat", "sc4lot", "sc4desc", "sc4model" };
-		private char[] identifier;
-		public char[] HeaderIdentifier {
-			get { return identifier; }
-			set { identifier = value; }
-		}
-		private uint majorVersion;
-		public uint HeaderMajorVersion {
-			get { return majorVersion; }
-			set {
-				if (value != (uint)1) {
-					throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
-				} else {
-					majorVersion = value;
+
+		private class DBPFHeader {
+			private char[] identifier;
+			public char[] HeaderIdentifier {
+				get { return identifier; }
+				set { identifier = value; }
+			}
+
+			private uint majorVersion;
+			public uint HeaderMajorVersion {
+				get { return majorVersion; }
+				set {
+					if (value != (uint) 1) {
+						throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
+					}
+					else {
+						majorVersion = value;
+					}
 				}
 			}
-		}
-		private uint minorVersion;
-		public uint HeaderMinorVersion {
-			get { return minorVersion; }
-			set {
-				if (value != (uint) 0) {
-					throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
-				}
-				else {
+
+			private uint minorVersion;
+			public uint HeaderMinorVersion {
+				get { return minorVersion; }
+				set {
+					if (value != (uint) 0) {
+						throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
+					}
+					else {
+						minorVersion = value;
+					}
 					minorVersion = value;
 				}
-				minorVersion = value; 
+			}
+
+			private uint dateCreated;
+			public uint HeaderDateCreated {
+				get { return dateCreated; }
+				set { dateCreated = value; }
+			}
+
+			private uint dateModified;
+			public uint HeaderDateModified {
+				get { return dateModified; }
+				set { dateModified = value; }
+			}
+
+			private uint indexVersion;
+			public uint HeaderIndexVersion {
+				get { return indexVersion; }
+				set { indexVersion = value; }
+			}
+
+			private uint indexEntryCount;
+			public uint HeaderIndexEntryCount {
+				get { return indexEntryCount; }
+				set { indexEntryCount = value; }
+			}
+
+			private uint indexEntryOffset;
+			public uint HeaderIndexEntryOffset {
+				get { return indexEntryOffset; }
+				set { indexEntryOffset = value; }
+			}
+
+			private uint indexSize;
+			public uint HeaderIndexSize {
+				get { return indexSize; }
+				set { indexSize = value; }
+			}
+
+			private uint holeEntryCount;
+			public uint HeaderHoleEntryCount {
+				get { return holeEntryCount; }
+				set { holeEntryCount = value; }
+			}
+
+			private uint holeOffset;
+			public uint HeaderHoleOffset {
+				get { return holeOffset; }
+				set { holeOffset = value; }
+			}
+
+			private uint holeSize;
+			public uint HeaderHoleSize {
+				get { return holeSize; }
+				set { holeSize = value; }
+			}
+
+
+			// Default Constructor
+			public DBPFHeader() {
+				majorVersion = (uint) 1;
+				minorVersion = (uint) 0;
+				dateCreated = (uint) DateTimeOffset.Now.ToUnixTimeSeconds();
+				dateModified = (uint) DateTimeOffset.Now.ToUnixTimeSeconds();
+				indexVersion = (uint) 7;
+				//indexEntryCount;
+				//indexEntryOffset;
+				//indexSize;
+				holeEntryCount = (uint) 0;
+				holeOffset = (uint) 0;
+				holeSize = (uint) 0;
+			}
+
+			// Constructor with supplied values
+			public DBPFHeader(byte[] headerByteInfo) {
+				//check if input is the proper length of 96 bytes
+				if (headerByteInfo.Length != 96) {
+					throw new Exception($"Incorrect header size supplied to the DBPFHeader class. Provided {headerByteInfo.Length}, expected 96.");
+				}
+
+
+				//Dictionary<int,uint> 
+			}
+
+			public override string ToString() {
+				return base.ToString();
 			}
 		}
-		private uint dateCreated;
-		public uint HeaderDateCreated {
-			get { return dateCreated; }
-			set { dateCreated = value; }
+
+
+
+
+
+
+
+
+
+
+
+		public DBPFFile() {
+
+
 		}
-		private uint dateModified;
-		public uint HeaderDateModified {
-			get { return dateModified; }
-			set { dateModified = value; }
-		}
-		private uint indexVersion;
-		public uint HeaderIndexVersion {
-			get { return indexVersion; }
-			set { indexVersion = value; }
-		}
-		private uint indexEntryCount;
-		public uint HeaderIndexEntryCount {
-			get { return indexEntryCount; }
-			set { indexEntryCount = value; }
-		}
-		private uint indexEntryOffset;
-		public uint HeaderIndexEntryOffset {
-			get { return indexEntryOffset; }
-			set { indexEntryOffset = value; }
-		}
-		private uint indexSize;
-		public uint HeaderIndexSize {
-			get { return indexSize; }
-			set { indexSize = value; }
-		}
-		private uint holeEntryCount;
-		public uint HeaderHoleEntryCount {
-			get { return holeEntryCount; }
-			set { holeEntryCount = value; }
-		}
-		private uint holeOffset;
-		public uint HeaderHoleOffset {
-			get { return holeOffset; }
-			set { holeOffset = value; }
-		}
-		private uint holeSize;
-		public uint HeaderHoleSize {
-			get { return holeSize; }
-			set { holeSize = value; }
-		}
+
 
 		/// <summary>
 		/// Filters a list of file paths based on SC4 file extensions.
@@ -99,16 +161,17 @@ namespace SC4DP2022_wpf {
 					sc4Files.Add(file);
 					Trace.WriteLine(file);
 					Trace.WriteLine("   " + isDBPF(file));
-				} else {
+				}
+				else {
 					skippedFiles.Add(file);
 				}
 			}
 
-			return (sc4Files,skippedFiles);
+			return (sc4Files, skippedFiles);
 		}
 
 		//https://www.wiki.sc4devotion.com/index.php?title=DBPF
-		public bool isDBPF (string filePath) { // [possibly rewrite using the Binary class??? https://docs.microsoft.com/en-us/dotnet/api/system.data.linq.binary?view=netframework-4.8
+		public bool isDBPF(string filePath) { // [possibly rewrite using the Binary class??? https://docs.microsoft.com/en-us/dotnet/api/system.data.linq.binary?view=netframework-4.8
 			byte[] identifierFile = new byte[4];
 			byte[] identifierDbpf = new byte[] { 0x44, 0x42, 0x50, 0x46 };
 			FileStream fs = new FileStream(filePath, FileMode.Open);
@@ -116,5 +179,7 @@ namespace SC4DP2022_wpf {
 			reader.BaseStream.Read(identifierFile, 0, 4);
 			return identifierFile.SequenceEqual(identifierDbpf);
 		}
+
+
 	}
 }

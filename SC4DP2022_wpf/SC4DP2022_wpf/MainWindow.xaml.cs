@@ -114,7 +114,7 @@ namespace SC4DP2022_wpf {
 			List<string> allFiles = new List<string>();
 			List<string> sc4Files;
 			List<string> skippedFiles;
-			DBPF dbpf = new DBPF();
+			DBPFFile dbpf = new DBPFFile();
 
 
 			SearchOption so;
