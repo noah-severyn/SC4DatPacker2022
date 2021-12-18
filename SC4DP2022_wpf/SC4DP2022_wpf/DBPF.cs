@@ -27,7 +27,7 @@ namespace SC4DP2022_wpf {
 			public uint HeaderIdentifier {
 				get { return identifier; }
 				set {
-					uint identifierDbpf = (uint) int.Parse("DBPF");
+					uint identifierDbpf = (uint) 44425046; //DBPF in hex
 					if (value.CompareTo(identifierDbpf) != 0) {
 						throw new Exception("File is not a DBPF file!");
 					}
@@ -117,7 +117,7 @@ namespace SC4DP2022_wpf {
 				get { return holeSize; }
 				set { holeSize = value; }
 			}
-			
+
 			private uint indexMinorVersion;
 
 			public uint HeaderIndexMinorVersion {
@@ -128,7 +128,7 @@ namespace SC4DP2022_wpf {
 
 			// Default Constructor
 			public DBPFHeader() {
-				identifier = (uint) int.Parse("DBPF");
+				identifier = (uint) 44425046; //DBPF in hex
 				majorVersion = (uint) 1;
 				minorVersion = (uint) 0;
 				dateCreated = (uint) DateTimeOffset.Now.ToUnixTimeSeconds();
