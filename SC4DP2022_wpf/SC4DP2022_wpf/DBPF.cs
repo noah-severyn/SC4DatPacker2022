@@ -14,7 +14,7 @@ namespace SC4DP2022_wpf {
 			public uint HeaderIdentifier {
 				get { return identifier; }
 				set {
-					uint identifierDbpf = (uint) 44425046; //DBPF in hex
+					uint identifierDbpf = (uint) 0x44425046; //1145196614 int = 44425046 hex = DBPF ascii
 					if (value.CompareTo(identifierDbpf) != 0) {
 						throw new Exception("File is not a DBPF file!");
 					}
@@ -28,7 +28,7 @@ namespace SC4DP2022_wpf {
 			public uint HeaderMajorVersion {
 				get { return majorVersion; }
 				set {
-					if (value != (uint) 1) {
+					if (value != (uint) 0x1000000) { //16777216 int = 1000000 hex
 						throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
 					}
 					else {
@@ -115,19 +115,19 @@ namespace SC4DP2022_wpf {
 
 			// Default Constructor
 			public DBPFHeader() {
-				identifier = (uint) 44425046; //DBPF in hex
-				majorVersion = (uint) 1;
-				minorVersion = (uint) 0;
-				dateCreated = (uint) DateTimeOffset.Now.ToUnixTimeSeconds();
-				dateModified = (uint) DateTimeOffset.Now.ToUnixTimeSeconds();
-				indexMajorVersion = (uint) 7;
-				//indexEntryCount;
-				//indexEntryOffset;
-				//indexSize;
-				holeEntryCount = (uint) 0;
-				holeOffset = (uint) 0;
-				holeSize = (uint) 0;
-				indexMinorVersion = (uint) 0;
+				//identifier = (uint) 44425046; //DBPF in hex
+				//majorVersion = (uint) 1;
+				//minorVersion = (uint) 0;
+				//dateCreated = (uint) DateTimeOffset.Now.ToUnixTimeSeconds();
+				//dateModified = (uint) DateTimeOffset.Now.ToUnixTimeSeconds();
+				//indexMajorVersion = (uint) 7;
+				////indexEntryCount;
+				////indexEntryOffset;
+				////indexSize;
+				//holeEntryCount = (uint) 0;
+				//holeOffset = (uint) 0;
+				//holeSize = (uint) 0;
+				//indexMinorVersion = (uint) 0;
 			}
 
 			// Constructor with supplied values
@@ -178,11 +178,11 @@ namespace SC4DP2022_wpf {
 				Array.Reverse(headerBytes);
 			}
 			DBPFHeader header = new DBPFHeader();
-			header.HeaderIdentifier = BitConverter.ToUInt32(headerBytes, 0);
+			header.HeaderIdentifier = BitConverter.ToUInt32(headerBytes, 92); //1145196614 int = 44425046 hex = DBPF ascii
 			System.Diagnostics.Debug.WriteLine("HeaderIdentifier: " + header.HeaderIdentifier);
-			header.HeaderMajorVersion = BitConverter.ToUInt32(headerBytes, 4);
+			header.HeaderMajorVersion = BitConverter.ToUInt32(headerBytes, 88);
 			System.Diagnostics.Debug.WriteLine("HeaderMajorVersion: " + header.HeaderMajorVersion);
-			header.HeaderMinorVersion = BitConverter.ToUInt32(headerBytes, 8);
+			header.HeaderMinorVersion = BitConverter.ToUInt32(headerBytes, 84);
 			System.Diagnostics.Debug.WriteLine("HeaderMinorVersion: " + header.HeaderMinorVersion);
 		}
 
