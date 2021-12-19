@@ -46,6 +46,7 @@ namespace SC4DP2022_wpf {
 			FileStream fs = new FileStream(filePath, FileMode.Open);
 			BinaryReader reader = new BinaryReader(fs);
 			reader.BaseStream.Read(identifierFile, 0, 4);
+			fs.Close();
 			return identifierFile.SequenceEqual(identifierDbpf);
 		}
 	}
