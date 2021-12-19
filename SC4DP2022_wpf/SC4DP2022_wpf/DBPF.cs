@@ -7,22 +7,9 @@ using System.Diagnostics;
 
 namespace SC4DP2022_wpf {
 	internal class DBPFFile {
-		private static readonly string[] sc4Extensions = { "dat", "sc4lot", "sc4desc", "sc4model" };
+		
 
 		private class DBPFHeader {
-			//private byte[] identifier;
-			//public byte[] HeaderIdentifier {
-			//	get { return identifier; }
-			//	set {
-			//		byte[] identifierDbpf = new byte[] { 0x44, 0x42, 0x50, 0x46 };
-			//		if (!value.SequenceEqual(identifierDbpf)) {
-			//			throw new Exception("File is not a DBPF file!");
-			//		}
-			//		else {
-			//			identifier = value;
-			//		}
-			//	}
-			//}
 			private uint identifier;
 			public uint HeaderIdentifier {
 				get { return identifier; }
@@ -144,27 +131,27 @@ namespace SC4DP2022_wpf {
 			}
 
 			// Constructor with supplied values
-			public DBPFHeader(uint[] headerInfo) {
-				//check if input is the proper length of 96 bytes
-				if (headerInfo.Length != 18) {
-					throw new Exception($"Incorrect header size supplied to the DBPFHeader class. Provided {headerInfo.Length}, expected 18.");
-				}
-				identifier = headerInfo[0];
-				majorVersion = headerInfo[1];
-				minorVersion = headerInfo[2];
-				dateCreated = headerInfo[6];
-				dateModified = headerInfo[7];
-				indexMajorVersion = headerInfo[8];
-				indexEntryCount = headerInfo[9];
-				indexEntryOffset = headerInfo[10];
-				indexSize = headerInfo[11];
-				holeEntryCount = headerInfo[12];
-				holeOffset = headerInfo[13];
-				holeSize = headerInfo[14];
-				indexMinorVersion = headerInfo[15];
-			}
+			//public DBPFHeader(uint[] headerInfo) {
+			//	//check if input is the proper length of 96 bytes
+			//	if (headerInfo.Length != 18) {
+			//		throw new Exception($"Incorrect header size supplied to the DBPFHeader class. Provided {headerInfo.Length}, expected 18.");
+			//	}
+			//	identifier = headerInfo[0];
+			//	majorVersion = headerInfo[1];
+			//	minorVersion = headerInfo[2];
+			//	dateCreated = headerInfo[6];
+			//	dateModified = headerInfo[7];
+			//	indexMajorVersion = headerInfo[8];
+			//	indexEntryCount = headerInfo[9];
+			//	indexEntryOffset = headerInfo[10];
+			//	indexSize = headerInfo[11];
+			//	holeEntryCount = headerInfo[12];
+			//	holeOffset = headerInfo[13];
+			//	holeSize = headerInfo[14];
+			//	indexMinorVersion = headerInfo[15];
+			//}
 
-			public override string ToString() {
+			public override string ToString() { //TODO : Implement this?
 				return base.ToString();
 			}
 		}
@@ -179,46 +166,30 @@ namespace SC4DP2022_wpf {
 
 
 
-		public DBPFFile() {
-
-
-		}
-
-
-		/// <summary>
-		/// Filters a list of file paths based on SC4 file extensions.
-		/// </summary>
-		/// <param name="filesToFilter">List of all files to filter through</param>
-		/// <returns>Tuple of List <string> (sc4Files,skippedFiles)</returns>
-		public (List<string>, List<string>) FilterFilesByExtension(List<string> filesToFilter) {
-			List<string> sc4Files = new List<string>();
-			List<string> skippedFiles = new List<string>();
-
-			string extension;
-			foreach (string file in filesToFilter) {
-				extension = file.Substring(file.LastIndexOf(".") + 1);
-				if (sc4Extensions.Any(extension.Contains)) { //https://stackoverflow.com/a/2912483/10802255
-					sc4Files.Add(file);
-					Trace.WriteLine(file);
-					Trace.WriteLine("   " + isDBPF(file));
-				}
-				else {
-					skippedFiles.Add(file);
-				}
-			}
-
-			return (sc4Files, skippedFiles);
-		}
-
-		//https://www.wiki.sc4devotion.com/index.php?title=DBPF
-		public bool isDBPF(string filePath) { // [possibly rewrite using the Binary class??? https://docs.microsoft.com/en-us/dotnet/api/system.data.linq.binary?view=netframework-4.8
-			byte[] identifierFile = new byte[4];
-			byte[] identifierDbpf = new byte[] { 0x44, 0x42, 0x50, 0x46 };
+		public DBPFFile(string filePath) {
+			//read first 96 bytes of file
+			byte[] headerBytes = new byte[96];
 			FileStream fs = new FileStream(filePath, FileMode.Open);
 			BinaryReader reader = new BinaryReader(fs);
-			reader.BaseStream.Read(identifierFile, 0, 4);
-			return identifierFile.SequenceEqual(identifierDbpf);
+			reader.BaseStream.Read(headerBytes, 0, 96);
+
+			// https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/types/how-to-convert-a-byte-array-to-an-int
+			if (BitConverter.IsLittleEndian) {
+				Array.Reverse(headerBytes);
+			}
+			DBPFHeader header = new DBPFHeader();
+			header.HeaderIdentifier = BitConverter.ToUInt32(headerBytes, 0);
+			System.Diagnostics.Debug.WriteLine("HeaderIdentifier: " + header.HeaderIdentifier);
+			header.HeaderMajorVersion = BitConverter.ToUInt32(headerBytes, 4);
+			System.Diagnostics.Debug.WriteLine("HeaderMajorVersion: " + header.HeaderMajorVersion);
+			header.HeaderMinorVersion = BitConverter.ToUInt32(headerBytes, 8);
+			System.Diagnostics.Debug.WriteLine("HeaderMinorVersion: " + header.HeaderMinorVersion);
 		}
+
+
+		
+
+
 
 
 	}

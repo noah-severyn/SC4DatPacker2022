@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.WindowsAPICodePack.Dialogs; //required for the folder selection dialogs;
+using 
 
 namespace SC4DP2022_wpf {
 	/// <summary>
@@ -114,7 +115,7 @@ namespace SC4DP2022_wpf {
 			List<string> allFiles = new List<string>();
 			List<string> sc4Files;
 			List<string> skippedFiles;
-			DBPFFile dbpf = new DBPFFile();
+			
 
 
 			SearchOption so;
@@ -133,7 +134,7 @@ namespace SC4DP2022_wpf {
 					allFiles.Add(file);
 				}
 
-				(sc4Files,skippedFiles) = dbpf.FilterFilesByExtension(allFiles);
+				(sc4Files,skippedFiles) = DBPFUtil.FilterFilesByExtension(allFiles);
 				foreach (string file in sc4Files) {
 					System.Diagnostics.Debug.WriteLine("sc4: " + file);
 				}
