@@ -14,7 +14,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.WindowsAPICodePack.Dialogs; //required for the folder selection dialogs;
-using 
 
 namespace SC4DP2022_wpf {
 	/// <summary>
@@ -105,22 +104,19 @@ namespace SC4DP2022_wpf {
 		/// <param name="e"></param>
 		private void Pack_Click(object sender, RoutedEventArgs e) {
 
-
+			// do nothing if no files were selected
 			if (FolderList.SelectedItems.Count == 0) {
 				return;
 			}
 
-
-			//generate list of files from selected folders
+			//instantiate lists to be used later
 			List<string> allFiles = new List<string>();
-			List<string> sc4Files;
-			List<string> skippedFiles;
+			List<string> sc4Files = new List<string>();
+			List<string> skippedFiles = new List<string>();
 			
-
-
+			//loop over the files the user selected in the list box
 			SearchOption so;
 			foreach (string folder in FolderList.SelectedItems) {
-
 				if (resurseIntoSubfolders) {
 					so = SearchOption.AllDirectories;
 				} else {
@@ -129,11 +125,13 @@ namespace SC4DP2022_wpf {
 
 				//list all files in the current root folder
 				string[] files = Directory.GetFiles(activeDirectoryPath + "\\" + folder, "*", so);
+				
 				//loop over the list of files and add them to the master file list
 				foreach (string file in files) {
 					allFiles.Add(file);
 				}
 
+				// return two lists with the sorted files
 				(sc4Files,skippedFiles) = DBPFUtil.FilterFilesByExtension(allFiles);
 				foreach (string file in sc4Files) {
 					System.Diagnostics.Debug.WriteLine("sc4: " + file);
@@ -142,6 +140,8 @@ namespace SC4DP2022_wpf {
 					System.Diagnostics.Debug.WriteLine("skipped: " + file);
 				}
 			}
+
+			DBPFFile dbpfFile = new DBPFFile(sc4Files[0]);
 		}
 
 
