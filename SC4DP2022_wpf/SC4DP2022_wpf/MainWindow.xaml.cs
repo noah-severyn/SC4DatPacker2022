@@ -104,20 +104,19 @@ namespace SC4DP2022_wpf {
 		/// <param name="e"></param>
 		private void Pack_Click(object sender, RoutedEventArgs e) {
 
-
+			// do nothing if no files were selected
 			if (FolderList.SelectedItems.Count == 0) {
-				System.Diagnostics.Debug.WriteLine("zero items selected. doing nothing.");
 				return;
 			}
-			System.Diagnostics.Debug.WriteLine("more than zero items selected. continuing...");
 
-
-			//generate list of files from selected folders
+			//instantiate lists to be used later
+			List<string> allFiles = new List<string>();
 			List<string> sc4Files = new List<string>();
-			List<string> skippedFiles = new List<string>(); // TODO: implement this
+			List<string> skippedFiles = new List<string>();
+			
+			//loop over the files the user selected in the list box
 			SearchOption so;
 			foreach (string folder in FolderList.SelectedItems) {
-
 				if (resurseIntoSubfolders) {
 					so = SearchOption.AllDirectories;
 				} else {
@@ -126,12 +125,23 @@ namespace SC4DP2022_wpf {
 
 				//list all files in the current root folder
 				string[] files = Directory.GetFiles(activeDirectoryPath + "\\" + folder, "*", so);
+				
 				//loop over the list of files and add them to the master file list
 				foreach (string file in files) {
-					sc4Files.Add(file);
-					System.Diagnostics.Debug.WriteLine("file added: " + file);
+					allFiles.Add(file);
+				}
+
+				// return two lists with the sorted files
+				(sc4Files,skippedFiles) = DBPFUtil.FilterFilesByExtension(allFiles);
+				foreach (string file in sc4Files) {
+					System.Diagnostics.Debug.WriteLine("sc4: " + file);
+				}
+				foreach (string file in skippedFiles) {
+					System.Diagnostics.Debug.WriteLine("skipped: " + file);
 				}
 			}
+
+			DBPFFile dbpfFile = new DBPFFile(sc4Files[0]);
 		}
 
 
