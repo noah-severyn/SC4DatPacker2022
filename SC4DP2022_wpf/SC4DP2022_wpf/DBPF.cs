@@ -6,7 +6,7 @@ using System.IO;
 using System.Diagnostics;
 
 namespace SC4DP2022_wpf {
-	internal class DBPFFile {
+	public class DBPFFile {
 		
 
 		private class DBPFHeader {
@@ -156,7 +156,9 @@ namespace SC4DP2022_wpf {
 			}
 		}
 
-
+		public int AddTwo(int a, int b) {
+			return a + b;
+		}
 
 
 
