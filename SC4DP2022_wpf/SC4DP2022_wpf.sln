@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SC4DP2022_wpfTests", "SC4DP2022_wpfTests\SC4DP2022_wpfTests.csproj", "{F8C2E04F-1F9B-4002-B344-5CE2F816766B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{97D471D3-37C2-46EC-B0BA-35414A3745BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97D471D3-37C2-46EC-B0BA-35414A3745BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97D471D3-37C2-46EC-B0BA-35414A3745BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8C2E04F-1F9B-4002-B344-5CE2F816766B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8C2E04F-1F9B-4002-B344-5CE2F816766B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8C2E04F-1F9B-4002-B344-5CE2F816766B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8C2E04F-1F9B-4002-B344-5CE2F816766B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
