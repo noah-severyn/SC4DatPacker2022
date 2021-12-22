@@ -83,13 +83,8 @@ namespace SC4DP2022_wpf {
 		/// <param name="path"></param>
 		private void PopulateFolderListbox(string path) {
 			string[] folders = Directory.GetDirectories(path);
+			FolderList.Items.Clear();
 
-			// Remove all existing list items
-			foreach (string item in FolderList.Items) {
-				FolderList.Items.Remove(item);
-			}
-
-			// Add the new list items from the source directory
 			foreach (string dir in folders) {
 				FolderList.Items.Add(dir.Substring(dir.LastIndexOf("\\") + 1));
 			}
@@ -113,26 +108,27 @@ namespace SC4DP2022_wpf {
 			List<string> allFiles = new List<string>();
 			List<string> sc4Files = new List<string>();
 			List<string> skippedFiles = new List<string>();
-			
+
 			//loop over the files the user selected in the list box
 			SearchOption so;
 			foreach (string folder in FolderList.SelectedItems) {
 				if (resurseIntoSubfolders) {
 					so = SearchOption.AllDirectories;
-				} else {
+				}
+				else {
 					so = SearchOption.TopDirectoryOnly;
 				}
 
 				//list all files in the current root folder
 				string[] files = Directory.GetFiles(activeDirectoryPath + "\\" + folder, "*", so);
-				
+
 				//loop over the list of files and add them to the master file list
 				foreach (string file in files) {
 					allFiles.Add(file);
 				}
 
 				// return two lists with the sorted files
-				(sc4Files,skippedFiles) = DBPFUtil.FilterFilesByExtension(allFiles);
+				(sc4Files, skippedFiles) = DBPFUtil.FilterFilesByExtension(allFiles);
 				foreach (string file in sc4Files) {
 					System.Diagnostics.Debug.WriteLine("sc4: " + file);
 				}
@@ -153,6 +149,10 @@ namespace SC4DP2022_wpf {
 		/// <param name="e"></param>
 		private void Quit_Click(object sender, RoutedEventArgs e) {
 			Application.Current.Shutdown();
+		}
+
+		private void Refresh_Click(object sender, RoutedEventArgs e) {
+			PopulateFolderListbox(activeDirectoryPath);
 		}
 	}
 }

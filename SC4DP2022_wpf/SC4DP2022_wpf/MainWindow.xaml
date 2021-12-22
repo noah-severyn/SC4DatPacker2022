@@ -94,5 +94,19 @@
 				   Width="218"
 				   Height="17"
 				   VerticalAlignment="Bottom" />
+		<Button x:Name="Refresh"
+				Grid.Row="3"
+				HorizontalAlignment="Left"
+				Margin="252,6,0,0"
+				VerticalAlignment="Top"
+				Width="20"
+				Click="Refresh_Click"
+				Height="20"
+				ToolTip="Refresh folder view">
+			<Image Source="refresh_icon.png"
+				   Height="15"
+				   Width="15" />
+			
+		</Button>
 	</Grid>
 </Window>
