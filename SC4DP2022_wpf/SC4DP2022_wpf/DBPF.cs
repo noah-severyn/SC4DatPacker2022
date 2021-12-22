@@ -14,7 +14,7 @@ namespace SC4DP2022_wpf {
 		public uint HeaderIdentifier {
 			get { return identifier; }
 			set {
-				uint identifierDbpf = (uint) 0x44425046; //1145196614 int = 44425046 hex = DBPF ascii
+				uint identifierDbpf = (uint) 0x44425046; //1145196614 dec = 44425046 hex = DBPF ascii
 				if (value.CompareTo(identifierDbpf) != 0) {
 					throw new Exception("File is not a DBPF file!");
 				}
@@ -28,7 +28,7 @@ namespace SC4DP2022_wpf {
 		public uint HeaderMajorVersion {
 			get { return majorVersion; }
 			set {
-				if (value != (uint) 0x1000000) { //16777216 int = 1000000 hex
+				if (value != (uint) 0x1000000) { //16777216 dec = 1000000 hex
 					throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
 				}
 				else {
@@ -66,7 +66,14 @@ namespace SC4DP2022_wpf {
 		private uint indexMajorVersion;
 		public uint HeaderIndexMajorVersion {
 			get { return indexMajorVersion; }
-			set { indexMajorVersion = value; }
+			set {
+				if (value != (uint) 0x7000000) { //117440512 dec = 7000000 hex
+					throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
+				}
+				else {
+					indexMajorVersion = value;
+				}
+			}
 		}
 
 		private uint indexEntryCount;
@@ -182,6 +189,16 @@ namespace SC4DP2022_wpf {
 			System.Diagnostics.Debug.WriteLine("HeaderMajorVersion: " + this.HeaderMajorVersion);
 			this.HeaderMinorVersion = BitConverter.ToUInt32(headerBytes, 84);
 			System.Diagnostics.Debug.WriteLine("HeaderMinorVersion: " + this.HeaderMinorVersion);
+			this.HeaderDateCreated = BitConverter.ToUInt32(headerBytes, 68);
+			this.HeaderDateModified = BitConverter.ToUInt32(headerBytes, 64);
+			this.HeaderIndexMajorVersion = BitConverter.ToUInt32(headerBytes, 60);
+			this.HeaderIndexEntryCount = BitConverter.ToUInt32(headerBytes, 56);
+			this.HeaderIndexEntryOffset = BitConverter.ToUInt32(headerBytes, 52);
+			this.HeaderIndexSize = BitConverter.ToUInt32(headerBytes, 48);
+			this.HeaderHoleEntryCount = BitConverter.ToUInt32(headerBytes, 44);
+			this.HeaderHoleOffset = BitConverter.ToUInt32(headerBytes, 40);
+			this.HeaderHoleSize = BitConverter.ToUInt32(headerBytes, 36);
+			this.HeaderIndexMinorVersion = BitConverter.ToUInt32(headerBytes, 32);
 		}
 
 	}
