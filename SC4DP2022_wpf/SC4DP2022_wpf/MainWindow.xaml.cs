@@ -170,10 +170,20 @@ namespace SC4DP2022_wpf {
 			Application.Current.Shutdown();
 		}
 
+		/// <summary>
+		/// Refreshes the list box if folders were added or deleted since the application was opened.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Refresh_Click(object sender, RoutedEventArgs e) {
 			PopulateFolderListbox(activeDirectoryPath);
 		}
 
+		/// <summary>
+		/// Opens the preferences window.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Preferences_Click(object sender, RoutedEventArgs e) {
 			Preferences p = new Preferences();
 			p.Show();
