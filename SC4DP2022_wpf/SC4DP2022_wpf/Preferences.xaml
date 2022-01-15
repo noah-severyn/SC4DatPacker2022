@@ -6,34 +6,37 @@
         xmlns:local="clr-namespace:SC4DP2022_wpf"
         mc:Ignorable="d"
 		Title="Preferences"
-		Height="400"
-		Width="600"
-		MinHeight="350"
-		MinWidth="250">
+		Height="220"
+		Width="500"
+		Closing="Preferences_Closing"
+		ResizeMode="NoResize">
 	<Grid>
 		<Grid.RowDefinitions>
+			<RowDefinition Height="28" />
+			<RowDefinition Height="20" />
+			<RowDefinition Height="28" />
+			<RowDefinition Height="20" />
+			<RowDefinition Height="28" />
+			<RowDefinition Height="20" />
 			<RowDefinition Height="*" />
-			<RowDefinition Height="*" />
-			<RowDefinition Height="*" />
-			<RowDefinition Height="*" />
-			<RowDefinition Height="*" />
-			
 		</Grid.RowDefinitions>
+		
 		<Label x:Name="lbl_DefaultSourceDirectory"
 			   Grid.Row="0"
 			   Content="Default Source Directory"
 			   HorizontalAlignment="Left"
 			   Margin="10,0,0,0"
 			   VerticalAlignment="Center"
+			   
 			   Width="170"
 			   Height="26"
 			   ToolTip="This is the directory where the files to be packed are located. Subfolders of the source directory will appear in the listbox on application startup." />
 		<TextBox x:Name="DefaultSourceDirectory"
 				 Grid.Row="1"
-				 Margin="10,0,40,0"
+				 Margin="10,0,10,0"
 				 TextWrapping="NoWrap"
 				 VerticalAlignment="Center"
-				 TextAlignment="Right"
+				 TextAlignment="Left"
 				 Height="18" />
 		<Label x:Name="lbl_DefaultDestinationDirectory"
 			   Grid.Row="2"
@@ -46,12 +49,30 @@
 			   ToolTip="This is the directory where the datpacked file will be saved." />
 		<TextBox x:Name="DefaultDestinationDirectory"
 				 Grid.Row="3"
-				 Margin="10,0,40,0"
+				 Margin="10,0,10,0"
 				 TextWrapping="NoWrap"
 				 VerticalAlignment="Center"
-				 TextAlignment="Right"
+				 TextAlignment="Left"
 				 Height="18" />
-		<Grid Grid.Row="4">
+		<Label x:Name="lbl_DefaultWindowSize"
+			   Grid.Row="4"
+			   Content="Default Window Size"
+			   Margin="10,0,0,0"
+			   HorizontalAlignment="Left"
+			   VerticalAlignment="Center"
+			   Width="170"
+			   Height="26"
+			   ToolTip="Set default window size on application startup. Required format of two numbers separated by 'x': HHHxWWW"/>
+		<TextBox x:Name="DefaultWindowSize"
+				 Grid.Row="5"
+				 Margin="10,0,0,0"
+				 TextWrapping="NoWrap"
+				 VerticalAlignment="Center"
+				 HorizontalAlignment="Left"
+				 TextAlignment="Center"
+				 Height="18"
+				 Width="100" />
+		<Grid Grid.Row="6">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="*" />
 			</Grid.RowDefinitions>
