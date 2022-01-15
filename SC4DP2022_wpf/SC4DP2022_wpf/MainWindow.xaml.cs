@@ -173,5 +173,10 @@ namespace SC4DP2022_wpf {
 		private void Refresh_Click(object sender, RoutedEventArgs e) {
 			PopulateFolderListbox(activeDirectoryPath);
 		}
+
+		private void Preferences_Click(object sender, RoutedEventArgs e) {
+			Preferences p = new Preferences();
+			p.Show();
+		}
 	}
 }

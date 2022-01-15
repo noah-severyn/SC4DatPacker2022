@@ -121,7 +121,33 @@
 				VerticalAlignment="Top"
 				Content="Quit"
 				Click="Quit_Click" />
-
+		<Button x:Name="Preferences"
+				Grid.Row="3"
+				Height="20"
+				Width="70"
+				Margin="10,36,0,0"
+				VerticalAlignment="Top"
+				HorizontalAlignment="Left"
+				Click="Preferences_Click"
+				ToolTip="Change Preferences">
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="15" />
+					<ColumnDefinition Width="55" />
+				</Grid.ColumnDefinitions>
+				<Image Source="settings_icon.png"
+					   Grid.Column="0"
+					   Height="15"
+					   Width="15"
+					   VerticalAlignment="Center"
+					   HorizontalAlignment="Center"
+					   Margin="0, 0, 0,0" />
+				<TextBlock Grid.Column="1"
+						   Text="Settings"
+						   VerticalAlignment="Center"
+						   HorizontalAlignment="Center" />
+			</Grid>
+		</Button>
 		<TextBlock x:Name="lbl_Version"
 				   Margin="0,0,154,36"
 				   Grid.Row="3"
