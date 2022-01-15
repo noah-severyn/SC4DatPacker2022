@@ -22,10 +22,29 @@ namespace SC4DP2022_wpf {
 	public partial class MainWindow : Window {
 		private string activeDirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SimCity 4\\Plugins";
 		private string destinationDirectoryPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\SimCity 4\\Plugins\\Plugins_Compressed";
-		private bool resurseIntoSubfolders = true;
+		private bool recurseIntoSubfolders = true;
 
 		public MainWindow() {
 			InitializeComponent();
+
+			//Read settings file on startup and set properties if set
+			if (!Properties.Settings.Default.DefaultSourceDirectory.Equals("")) {
+				activeDirectoryPath = Properties.Settings.Default.DefaultSourceDirectory;
+			}
+			if (!Properties.Settings.Default.DefaultDestinationDirectory.Equals("")) {
+				destinationDirectoryPath = Properties.Settings.Default.DefaultDestinationDirectory;
+			}
+
+			int h; int w; int resolutionDividerLocn;
+			resolutionDividerLocn = Properties.Settings.Default.DefaultWindowDimensions.IndexOf("x");
+			if (resolutionDividerLocn == -1) {
+				throw new ArgumentException($"Invalid resolution setting. Expected format WWWxHHH, received {Properties.Settings.Default.DefaultWindowDimensions}");
+			}
+			Int32.TryParse(Properties.Settings.Default.DefaultWindowDimensions.Substring(0, 3), out w);
+			this.Height = w;
+			Int32.TryParse(Properties.Settings.Default.DefaultWindowDimensions.Substring(0, 3), out h);
+			this.Width = h;
+			recurseIntoSubfolders = Properties.Settings.Default.DefaultPackMethod;
 
 			// Set default folders on startup + fill listbox with items in default folder
 			SourceDirectory.Text = activeDirectoryPath;
@@ -112,7 +131,7 @@ namespace SC4DP2022_wpf {
 			//loop over the files the user selected in the list box
 			SearchOption so;
 			foreach (string folder in FolderList.SelectedItems) {
-				if (resurseIntoSubfolders) {
+				if (recurseIntoSubfolders) {
 					so = SearchOption.AllDirectories;
 				}
 				else {
