@@ -9,7 +9,7 @@ using System.Diagnostics;
 namespace SC4DP2022_wpf {
 	public class DBPFFile {
 		public Header header; //TODO - does this need to be sealed? How to modify Header to allow this?
-		public FileInfo file; //TODO - this probably needs to be replaced with a file type of something like 'File' later on
+		public FileInfo file; //probably best to use the FileInfo object to better deal with io errors
 		public OrderedDictionary entryMap; //TODO - implement entrymap
 		//TODO - implement tgimap
 
@@ -70,7 +70,7 @@ namespace SC4DP2022_wpf {
 				get { return _indexMajorVersion; }
 				set {
 					if (value != (uint) 0x7000000) { //117440512 dec = 7000000 hex
-						throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
+						throw new Exception("Unsupported index version. Only 7 is supported for SC4 DBPF files.");
 					}
 					else {
 						_indexMajorVersion = value;
@@ -106,21 +106,6 @@ namespace SC4DP2022_wpf {
 			//}
 		}
 
-
-		//Constructor with supplied values
-		//public DBPFFile(string fileName, uint majorVersion, uint minorVersion, uint dateCreated, uint dateModified, uint indexMajorVersion, uint indexEntryCount, uint indexOffsetLocation, uint indexSize) {  //TODO - change constructor to private
-		//	this.file = fileName;
-		//	this.header = new Header();
-		//	this.header.majorVersion = majorVersion;
-		//	this.header.minorVersion = minorVersion;
-		//	this.header.dateCreated = dateCreated;
-		//	this.header.dateModified = dateModified;
-		//	this.header.indexMajorVersion = indexMajorVersion;
-		//	this.header.indexEntryCount = indexEntryCount;
-		//	this.header.indexEntryOffset = indexOffsetLocation;
-		//	this.header.indexSize = indexSize;
-		//}
-
 		public override string ToString() { //TODO : Implement this?
 			return base.ToString();
 		}
@@ -155,14 +140,13 @@ namespace SC4DP2022_wpf {
 			//this.header.indexEntryOffset = BitConverter.ToUInt32(headerBytes, 52);
 			//this.header.indexSize = BitConverter.ToUInt32(headerBytes, 48);
 
-			FileInfo file = new FileInfo(filePath); //probably best to use the FileInfo object to better deal with io errors
-			Header header = new Header();
-			readHeader(file, header);
+			this.file = new FileInfo(filePath);
+			this.header = new Header();
+			readHeader(file);
 
 		}
 
-		public void readHeader(FileInfo inputFile, Header header) {
-			
+		public void readHeader(FileInfo inputFile) {
 			FileStream fs = new FileStream(inputFile.FullName, FileMode.Open);
 			BinaryReader br = new BinaryReader(fs);
 			header.identifier = DBPFUtil.ReverseBytes(br.ReadUInt32());
