@@ -26,7 +26,7 @@ namespace SC4DP2022_wpf {
 				if (sc4Extensions.Any(extension.Contains)) { //https://stackoverflow.com/a/2912483/10802255
 					sc4Files.Add(file);
 					Trace.WriteLine(file);
-					Trace.WriteLine("   " + isDBPF(file));
+					//Trace.WriteLine("   " + isDBPF(file));
 				}
 				else {
 					skippedFiles.Add(file);
@@ -37,17 +37,14 @@ namespace SC4DP2022_wpf {
 		}
 
 
-
-
-		//https://www.wiki.sc4devotion.com/index.php?title=DBPF
-		public static bool isDBPF(string filePath) { // [possibly rewrite using the Binary class??? https://docs.microsoft.com/en-us/dotnet/api/system.data.linq.binary?view=netframework-4.8
-			byte[] identifierFile = new byte[4];
-			byte[] identifierDbpf = new byte[] { 0x44, 0x42, 0x50, 0x46 };
-			FileStream fs = new FileStream(filePath, FileMode.Open);
-			BinaryReader reader = new BinaryReader(fs);
-			reader.BaseStream.Read(identifierFile, 0, 4);
-			fs.Close();
-			return identifierFile.SequenceEqual(identifierDbpf);
+		/// <summary>
+		/// Reverses the byte order for a uint. See:https://stackoverflow.com/a/18145923/10802255
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public static uint ReverseBytes(uint value) {
+			return (value & 0x000000FFU) << 24 | (value & 0x0000FF00U) << 8 | (value & 0x00FF0000U) >> 8 | (value & 0xFF000000U) >> 24;
 		}
+
 	}
 }
