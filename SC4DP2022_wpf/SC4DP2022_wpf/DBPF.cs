@@ -9,126 +9,115 @@ namespace SC4DP2022_wpf {
 	public class DBPFFile {
 
 
-		public class Header {
-			private uint identifier;
-			private uint majorVersion;
-			private uint minorVersion;
-			private uint dateCreated;
-			private uint dateModified;
-			private uint indexMajorVersion;
-			private uint indexEntryCount;
-			private uint indexEntryOffset;
-			private uint indexSize;
-
-			//empty constructor to prevent automatic creation of one with default values for fields
-			private Header() { }
-
-			public uint GetMajorVersion() {
-				return majorVersion;
+		//private class DBPFHeader {
+		private uint identifier;
+		public uint HeaderIdentifier {
+			get { return identifier; }
+			set {
+				uint identifierDbpf = (uint) 0x44425046; //1145196614 dec = 44425046 hex = DBPF ascii
+				if (value.CompareTo(identifierDbpf) != 0) {
+					throw new Exception("File is not a DBPF file!");
+				}
+				else {
+					identifier = value;
+				}
 			}
-			public uint GetMinorVersion() {
-				return minorVersion;
-			}
-			public uint GetDateCreated() {
-				return dateCreated;
-			}
-			public uint GetDateModified() {
-				return dateModified;
-			}
-			public uint GetIndexMajorVersion() {
-				return indexMajorVersion;
-			}
-			public uint GetIndexEntryCount() {
-				return indexEntryCount;
-			}
-			public uint GetIndexEntryOffset() {
-				return indexEntryOffset;
-			}
-			public uint GetIndexSize() {
-				return indexSize;
-			}
-
-			public override string ToString() {
-				StringBuilder sb = new StringBuilder();
-				sb.Append($"Version: {majorVersion}.{minorVersion}; ");
-				sb.Append($"Created: {dateCreated}; "); //TODO - need to format this to readable values - done in util class?
-				sb.Append($"Modified: {dateModified}; "); //TODO - need to format this to readable values - done in util class?
-				sb.Append($"Index Major Version: {indexMajorVersion}; ");
-				sb.Append($"Index Entry Count: {indexEntryCount}; ");
-				sb.Append($"Index Entry Offset Location: {indexEntryOffset}; ");
-				sb.Append($"Index Size: {indexSize}; ");
-				return sb.ToString();
-			}
-
-
 		}
-		//private uint identifier;
-		//public uint HeaderIdentifier {
-		//	get { return identifier; }
-		//	set {
-		//		uint identifierDbpf = (uint) 0x44425046; //1145196614 dec = 44425046 hex = DBPF ascii
-		//		if (value.CompareTo(identifierDbpf) != 0) {
-		//			throw new Exception("File is not a DBPF file!");
-		//		}
-		//		else {
-		//			identifier = value;
-		//		}
-		//	}
-		//}
 
-		//private uint majorVersion;
-		//public uint HeaderMajorVersion {
-		//	get { return majorVersion; }
-		//	set {
-		//		if (value != (uint) 0x1000000) { //16777216 dec = 1000000 hex
-		//			throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
-		//		}
-		//		else {
-		//			majorVersion = value;
-		//		}
-		//	}
-		//}
+		private uint majorVersion;
+		public uint HeaderMajorVersion {
+			get { return majorVersion; }
+			set {
+				if (value != (uint) 0x1000000) { //16777216 dec = 1000000 hex
+					throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
+				}
+				else {
+					majorVersion = value;
+				}
+			}
+		}
 
-		//private uint minorVersion;
-		//public uint HeaderMinorVersion {
-		//	get { return minorVersion; }
-		//	set {
-		//		if (value != (uint) 0) {
-		//			throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
-		//		}
-		//		else {
-		//			minorVersion = value;
-		//		}
-		//		minorVersion = value;
-		//	}
-		//}
+		private uint minorVersion;
+		public uint HeaderMinorVersion {
+			get { return minorVersion; }
+			set {
+				if (value != (uint) 0) {
+					throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
+				}
+				else {
+					minorVersion = value;
+				}
+				minorVersion = value;
+			}
+		}
 
-		//private uint dateCreated;
-		//public uint HeaderDateCreated {
-		//	get { return dateCreated; }
-		//	set { dateCreated = value; }
-		//}
+		private uint dateCreated;
+		public uint HeaderDateCreated {
+			get { return dateCreated; }
+			set { dateCreated = value; }
+		}
 
-		//private uint dateModified;
-		//public uint HeaderDateModified {
-		//	get { return dateModified; }
-		//	set { dateModified = value; }
-		//}
+		private uint dateModified;
+		public uint HeaderDateModified {
+			get { return dateModified; }
+			set { dateModified = value; }
+		}
 
-		//private uint indexMajorVersion;
-		//public uint HeaderIndexMajorVersion {
-		//	get { return indexMajorVersion; }
-		//	set {
-		//		if (value != (uint) 0x7000000) { //117440512 dec = 7000000 hex
-		//			throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
-		//		}
-		//		else {
-		//			indexMajorVersion = value;
-		//		}
-		//	}
-		//}
+		private uint indexMajorVersion;
+		public uint HeaderIndexMajorVersion {
+			get { return indexMajorVersion; }
+			set {
+				if (value != (uint) 0x7000000) { //117440512 dec = 7000000 hex
+					throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
+				}
+				else {
+					indexMajorVersion = value;
+				}
+			}
+		}
 
+		private uint indexEntryCount;
+		public uint HeaderIndexEntryCount {
+			get { return indexEntryCount; }
+			set { indexEntryCount = value; }
+		}
 
+		private uint indexEntryOffset;
+		public uint HeaderIndexEntryOffset {
+			get { return indexEntryOffset; }
+			set { indexEntryOffset = value; }
+		}
+
+		private uint indexSize;
+		public uint HeaderIndexSize {
+			get { return indexSize; }
+			set { indexSize = value; }
+		}
+
+		private uint holeEntryCount;
+		public uint HeaderHoleEntryCount {
+			get { return holeEntryCount; }
+			set { holeEntryCount = value; }
+		}
+
+		private uint holeOffset;
+		public uint HeaderHoleOffset {
+			get { return holeOffset; }
+			set { holeOffset = value; }
+		}
+
+		private uint holeSize;
+		public uint HeaderHoleSize {
+			get { return holeSize; }
+			set { holeSize = value; }
+		}
+
+		private uint indexMinorVersion;
+
+		public uint HeaderIndexMinorVersion {
+			get { return indexMinorVersion; }
+			set { indexMinorVersion = value; }
+		}
 
 
 		// Default Constructor
@@ -172,6 +161,7 @@ namespace SC4DP2022_wpf {
 		public override string ToString() { //TODO : Implement this?
 			return base.ToString();
 		}
+		//}
 
 
 
@@ -182,11 +172,6 @@ namespace SC4DP2022_wpf {
 
 
 		public DBPFFile(string filePath) {
-			ReadDBPFHeader(filePath);
-		}
-
-		//idea is to read only the header of the file first to quickly evaluate if dbpf or not
-		public void ReadDBPFHeader(string filePath) {
 			//read first 96 bytes of file
 			byte[] headerBytes = new byte[96];
 			FileStream fs = new FileStream(filePath, FileMode.Open);
@@ -216,13 +201,5 @@ namespace SC4DP2022_wpf {
 			this.HeaderIndexMinorVersion = BitConverter.ToUInt32(headerBytes, 32);
 		}
 
-
-		public void ReadDBPFFile(string filePath) {
-			byte[] data = File.ReadAllBytes(filePath);
-			//continue here ... what to do next?
-			/* create dbpf object from data stream?
-			 * 
-			 */
-		}
 	}
 }
