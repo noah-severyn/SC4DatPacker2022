@@ -9,115 +9,132 @@ namespace SC4DP2022_wpf {
 	public class DBPFFile {
 
 
-		//private class DBPFHeader {
-		private uint identifier;
-		public uint HeaderIdentifier {
-			get { return identifier; }
-			set {
-				uint identifierDbpf = (uint) 0x44425046; //1145196614 dec = 44425046 hex = DBPF ascii
-				if (value.CompareTo(identifierDbpf) != 0) {
-					throw new Exception("File is not a DBPF file!");
-				}
-				else {
-					identifier = value;
-				}
+		public class Header {
+			private uint identifier;
+			private uint majorVersion;
+			private uint minorVersion;
+			private uint dateCreated;
+			private uint dateModified;
+			private uint indexMajorVersion;
+			private uint indexEntryCount;
+			private uint indexEntryOffset;
+			private uint indexSize;
+
+			//empty constructor to prevent automatic creation of blank constructor and assigning default values to fields
+			private Header() { }
+
+
+			public uint GetMajorVersion() {
+				return majorVersion;
 			}
-		}
-
-		private uint majorVersion;
-		public uint HeaderMajorVersion {
-			get { return majorVersion; }
-			set {
-				if (value != (uint) 0x1000000) { //16777216 dec = 1000000 hex
-					throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
-				}
-				else {
-					majorVersion = value;
-				}
+			public uint GetMinorVersion() {
+				return minorVersion;
 			}
-		}
-
-		private uint minorVersion;
-		public uint HeaderMinorVersion {
-			get { return minorVersion; }
-			set {
-				if (value != (uint) 0) {
-					throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
-				}
-				else {
-					minorVersion = value;
-				}
-				minorVersion = value;
+			public uint GetDateCreated() {
+				return dateCreated;
 			}
-		}
-
-		private uint dateCreated;
-		public uint HeaderDateCreated {
-			get { return dateCreated; }
-			set { dateCreated = value; }
-		}
-
-		private uint dateModified;
-		public uint HeaderDateModified {
-			get { return dateModified; }
-			set { dateModified = value; }
-		}
-
-		private uint indexMajorVersion;
-		public uint HeaderIndexMajorVersion {
-			get { return indexMajorVersion; }
-			set {
-				if (value != (uint) 0x7000000) { //117440512 dec = 7000000 hex
-					throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
-				}
-				else {
-					indexMajorVersion = value;
-				}
+			public uint GetDateModified() {
+				return dateModified;
 			}
+			public uint GetIndexMajorVersion() {
+				return indexMajorVersion;
+			}
+			public uint GetIndexEntryCount() {
+				return indexEntryCount;
+			}
+			public uint GetIndexOffsetLocation() {
+				return indexEntryOffset;
+			}
+			public uint GetIndexSize() {
+				return indexSize;
+			}
+
+			public override string ToString() {
+				StringBuilder sb = new StringBuilder();
+				sb.Append($"Version: {majorVersion}.{minorVersion}; ");
+				sb.Append($"Created: {dateCreated}; ");
+				sb.Append($"Modified: {dateModified}; ");
+				sb.Append($"Index Major Version: {indexMajorVersion}; ");
+				sb.Append($"Index Entry Count: {indexEntryCount}; ");
+				sb.Append($"Index Offset Location: {indexEntryOffset}; ");
+				sb.Append($"Index Size: {indexSize}; ");
+				return sb.ToString();
+
+			}
+
+
+
+
+
+
+
+
 		}
 
-		private uint indexEntryCount;
-		public uint HeaderIndexEntryCount {
-			get { return indexEntryCount; }
-			set { indexEntryCount = value; }
-		}
+		//public uint HeaderIdentifier {
+		//	get { return identifier; }
+		//	set {
+		//		uint identifierDbpf = (uint) 0x44425046; //1145196614 dec = 44425046 hex = DBPF ascii
+		//		if (value.CompareTo(identifierDbpf) != 0) {
+		//			throw new Exception("File is not a DBPF file!");
+		//		}
+		//		else {
+		//			identifier = value;
+		//		}
+		//	}
+		//}
 
-		private uint indexEntryOffset;
-		public uint HeaderIndexEntryOffset {
-			get { return indexEntryOffset; }
-			set { indexEntryOffset = value; }
-		}
 
-		private uint indexSize;
-		public uint HeaderIndexSize {
-			get { return indexSize; }
-			set { indexSize = value; }
-		}
+		//public uint HeaderMajorVersion {
+		//	get { return majorVersion; }
+		//	set {
+		//		if (value != (uint) 0x1000000) { //16777216 dec = 1000000 hex
+		//			throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
+		//		}
+		//		else {
+		//			majorVersion = value;
+		//		}
+		//	}
+		//}
 
-		private uint holeEntryCount;
-		public uint HeaderHoleEntryCount {
-			get { return holeEntryCount; }
-			set { holeEntryCount = value; }
-		}
 
-		private uint holeOffset;
-		public uint HeaderHoleOffset {
-			get { return holeOffset; }
-			set { holeOffset = value; }
-		}
+		//public uint HeaderMinorVersion {
+		//	get { return minorVersion; }
+		//	set {
+		//		if (value != (uint) 0) {
+		//			throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
+		//		}
+		//		else {
+		//			minorVersion = value;
+		//		}
+		//		minorVersion = value;
+		//	}
+		//}
 
-		private uint holeSize;
-		public uint HeaderHoleSize {
-			get { return holeSize; }
-			set { holeSize = value; }
-		}
 
-		private uint indexMinorVersion;
+		//public uint HeaderDateCreated {
+		//	get { return dateCreated; }
+		//	set { dateCreated = value; }
+		//}
 
-		public uint HeaderIndexMinorVersion {
-			get { return indexMinorVersion; }
-			set { indexMinorVersion = value; }
-		}
+
+		//public uint HeaderDateModified {
+		//	get { return dateModified; }
+		//	set { dateModified = value; }
+		//}
+
+
+		//public uint HeaderIndexMajorVersion {
+		//	get { return indexMajorVersion; }
+		//	set {
+		//		if (value != (uint) 0x7000000) { //117440512 dec = 7000000 hex
+		//			throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
+		//		}
+		//		else {
+		//			indexMajorVersion = value;
+		//		}
+		//	}
+		//}
 
 
 		// Default Constructor
