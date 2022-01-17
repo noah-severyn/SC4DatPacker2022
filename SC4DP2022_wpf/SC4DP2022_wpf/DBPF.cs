@@ -9,9 +9,9 @@ using System.Diagnostics;
 namespace SC4DP2022_wpf {
 	public class DBPFFile {
 		public Header header; //TODO - does this need to be sealed? How to modify Header to allow this?
-		public FileInfo file; //probably best to use the FileInfo object to better deal with io errors
-		public OrderedDictionary entryMap; //TODO - implement entrymap
-		//TODO - implement tgimap
+		public FileInfo file; //probably best to use the FileInfo object to better deal with IO errors
+		public OrderedDictionary entryMap; //TODO - implement entry map
+		//TODO - implement TGI map
 
 
 		public class Header {
@@ -27,7 +27,7 @@ namespace SC4DP2022_wpf {
 			public uint identifier {
 				get { return _identifier; }
 				set {
-					uint identifierDbpf = (uint) 0x44425046; //1145196614 dec = 44425046 hex = DBPF ascii
+					uint identifierDbpf = (uint) 0x44425046; //1145196614 decimal = 44425046 hex = DBPF ASCII
 					if (value.CompareTo(identifierDbpf) != 0) {
 						throw new Exception("File is not a DBPF file!");
 					}
@@ -39,7 +39,7 @@ namespace SC4DP2022_wpf {
 			public uint majorVersion {
 				get { return _majorVersion; }
 				set {
-					if (value != (uint) 0x1000000) { //16777216 dec = 1000000 hex
+					if (value != (uint) 0x1000000) { //16777216 decimal = 1000000 hex
 						throw new Exception("Unsupported major.minor version. Only 1.0 is supported for SC4 DBPF files.");
 					}
 					else {
@@ -69,7 +69,7 @@ namespace SC4DP2022_wpf {
 			public uint indexMajorVersion {
 				get { return _indexMajorVersion; }
 				set {
-					if (value != (uint) 0x7000000) { //117440512 dec = 7000000 hex
+					if (value != (uint) 0x7000000) { //117440512 decimal = 7000000 hex
 						throw new Exception("Unsupported index version. Only 7 is supported for SC4 DBPF files.");
 					}
 					else {
@@ -130,7 +130,7 @@ namespace SC4DP2022_wpf {
 			//	Array.Reverse(headerBytes);
 			//}
 			//Header header = new Header();
-			//this.header.identifier = BitConverter.ToUInt32(headerBytes, 92); //1145196614 int = 44425046 hex = DBPF ascii
+			//this.header.identifier = BitConverter.ToUInt32(headerBytes, 92); //1145196614 int = 44425046 hex = DBPF ASCII
 			//this.header.majorVersion = BitConverter.ToUInt32(headerBytes, 88);
 			//this.header.minorVersion = BitConverter.ToUInt32(headerBytes, 84);
 			//this.header.dateCreated = BitConverter.ToUInt32(headerBytes, 68);
@@ -140,14 +140,12 @@ namespace SC4DP2022_wpf {
 			//this.header.indexEntryOffset = BitConverter.ToUInt32(headerBytes, 52);
 			//this.header.indexSize = BitConverter.ToUInt32(headerBytes, 48);
 
+
 			this.file = new FileInfo(filePath);
 			this.header = new Header();
-			readHeader(file);
 
-		}
-
-		public void readHeader(FileInfo inputFile) {
-			FileStream fs = new FileStream(inputFile.FullName, FileMode.Open);
+			// Read Header Info
+			FileStream fs = new FileStream(file.FullName, FileMode.Open);
 			BinaryReader br = new BinaryReader(fs);
 			header.identifier = DBPFUtil.ReverseBytes(br.ReadUInt32());
 			header.majorVersion = DBPFUtil.ReverseBytes(br.ReadUInt32());
@@ -159,20 +157,68 @@ namespace SC4DP2022_wpf {
 			header.indexEntryCount = DBPFUtil.ReverseBytes(br.ReadUInt32());
 			header.indexEntryOffset = DBPFUtil.ReverseBytes(br.ReadUInt32());
 			header.indexSize = DBPFUtil.ReverseBytes(br.ReadUInt32());
+
+			//Read Index Info
+			br.BaseStream.Seek(header.indexEntryOffset, SeekOrigin.Begin);
+			for (int idx = 0; idx < header.indexEntryCount; idx++) {
+				uint typeID = DBPFUtil.ReverseBytes(br.ReadUInt32()); // & (uint)4294967295; TODO - investigate what this does and why it's required
+				uint groupID = DBPFUtil.ReverseBytes(br.ReadUInt32()); // & (uint)4294967295; TODO - investigate what this does and why it's required
+				uint instanceID = DBPFUtil.ReverseBytes(br.ReadUInt32()); // & (uint)4294967295; TODO - investigate what this does and why it's required
+				uint offset = DBPFUtil.ReverseBytes(br.ReadUInt32()); // & (uint)4294967295; TODO - investigate what this does and why it's required
+				uint size = DBPFUtil.ReverseBytes(br.ReadUInt32()); // & (uint)4294967295; TODO - investigate what this does and why it's required
+				DBPFTGI tgi = new DBPFTGI(typeID, groupID, instanceID);
+				DirectDBPFEntry entry = new DirectDBPFEntry(tgi, offset, size, (uint) idx);
+			}
+
 			br.Close();
 			fs.Close();
 		}
 
-		////https://www.wiki.sc4devotion.com/index.php?title=DBPF
-		//public static bool isDBPF(string filePath) { //TODO - possibly rewrite using the Binary class??? https://docs.microsoft.com/en-us/dotnet/api/system.data.linq.binary?view=netframework-4.8
-		//	byte[] identifierFile = new byte[4];
-		//	byte[] identifierDbpf = new byte[] { 0x44, 0x42, 0x50, 0x46 };
-		//	FileStream fs = new FileStream(filePath, FileMode.Open);
-		//	BinaryReader reader = new BinaryReader(fs);
-		//	reader.BaseStream.Read(identifierFile, 0, 4);
+		//private void ReadHeader() {
+		//	FileStream fs = new FileStream(file.FullName, FileMode.Open);
+		//	BinaryReader br = new BinaryReader(fs);
+		//	header.identifier = DBPFUtil.ReverseBytes(br.ReadUInt32());
+		//	header.majorVersion = DBPFUtil.ReverseBytes(br.ReadUInt32());
+		//	header.minorVersion = DBPFUtil.ReverseBytes(br.ReadUInt32());
+		//	br.BaseStream.Seek(12, SeekOrigin.Current); //skip 8 unused bytes
+		//	header.dateCreated = DBPFUtil.ReverseBytes(br.ReadUInt32());
+		//	header.dateModified = DBPFUtil.ReverseBytes(br.ReadUInt32());
+		//	header.indexMajorVersion = DBPFUtil.ReverseBytes(br.ReadUInt32());
+		//	header.indexEntryCount = DBPFUtil.ReverseBytes(br.ReadUInt32());
+		//	header.indexEntryOffset = DBPFUtil.ReverseBytes(br.ReadUInt32());
+		//	header.indexSize = DBPFUtil.ReverseBytes(br.ReadUInt32());
+		//	br.Close();
 		//	fs.Close();
-		//	return identifierFile.SequenceEqual(identifierDbpf);
 		//}
 
+
+		public class DirectDBPFEntry : DBPFEntry {
+			private readonly uint offset;
+			private readonly uint size;
+			private readonly uint index;
+
+			//Create a DBPF entry
+			public DirectDBPFEntry(DBPFTGI tgi, uint offset, uint size, uint index) : base(tgi) {
+				this.offset = offset;
+				this.size = size;
+				this.index = index;
+			}
+
+			//TODO - method equals is unimplemented in memo's code
+			//TODO - method hashCode is unimplemented in memo's code
+			public override string ToString() {
+				throw new NotImplementedException(); //TODO - implement this
+			}
+			public DBPFFile GetEncolsingDBPFFile() {
+				//return DBPFFile.this; //TODO - huh? this doesnt work
+				throw new NotImplementedException();
+			}
+
+			public string ToDetailString() {
+				StringBuilder sb = new StringBuilder(ToString());
+				sb.AppendLine($"Offset: {DBPFUtil.ToHex(offset, 8)} Size: {size}");
+				return sb.ToString();
+			}
+		}
 	}
 }
