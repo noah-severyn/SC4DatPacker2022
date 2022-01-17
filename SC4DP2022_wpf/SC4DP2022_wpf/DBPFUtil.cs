@@ -46,5 +46,15 @@ namespace SC4DP2022_wpf {
 			return (value & 0x000000FFU) << 24 | (value & 0x0000FF00U) << 8 | (value & 0x00FF0000U) >> 8 | (value & 0xFF000000U) >> 24;
 		}
 
+		/// <summary>
+		/// See: https://github.com/memo33/jDBPFX/blob/master/src/jdbpfx/util/DBPFUtil.java#L144
+		/// </summary>
+		/// <param name="value"></param>
+		/// <param name="length"></param>
+		/// <returns></returns>
+		public static string ToHex(uint value, int length) {
+			return string.Format("%0" + length + "X" + value);
+		}
+
 	}
 }
