@@ -26,7 +26,6 @@ namespace SC4DP2022_wpf {
 				if (sc4Extensions.Any(extension.Contains)) { //https://stackoverflow.com/a/2912483/10802255
 					sc4Files.Add(file);
 					Trace.WriteLine(file);
-					//Trace.WriteLine("   " + isDBPF(file));
 				}
 				else {
 					skippedFiles.Add(file);
@@ -52,9 +51,9 @@ namespace SC4DP2022_wpf {
 		/// <param name="value"></param>
 		/// <param name="length"></param>
 		/// <returns></returns>
-		public static string ToHex(uint value, int length) {
-			return string.Format("%0" + length + "X" + value);
-		}
+		//public static string ToHex(uint value, int length) {
+		//	return string.Format("%0" + length + "X" + value);
+		//}
 
 	}
 }
