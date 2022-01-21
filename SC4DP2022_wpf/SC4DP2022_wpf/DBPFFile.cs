@@ -11,7 +11,7 @@ namespace SC4DP2022_wpf {
 		public Header header; //TODO - does this need to be sealed? How to modify Header to allow this?
 		public FileInfo file; //probably best to use the FileInfo object to better deal with IO errors
 		public OrderedDictionary entryMap; //TODO - implement entry map
-		//TODO - implement TGI map
+		public Dictionary<uint, DBPFTGI> tgiMap;//TODO - implement TGI map
 
 
 		public class Header {
@@ -145,7 +145,7 @@ namespace SC4DP2022_wpf {
 			this.header = new Header();
 
 			// Read Header Info
-			FileStream fs = new FileStream(file.FullName, FileMode.Open);
+			FileStream fs = new FileStream(file.FullName, FileMode.Open); //TODO - https://docs.microsoft.com/en-us/dotnet/standard/io/handling-io-errors
 			BinaryReader br = new BinaryReader(fs);
 			header.identifier = DBPFUtil.ReverseBytes(br.ReadUInt32());
 			header.majorVersion = DBPFUtil.ReverseBytes(br.ReadUInt32());
@@ -158,9 +158,14 @@ namespace SC4DP2022_wpf {
 			header.indexEntryOffset = DBPFUtil.ReverseBytes(br.ReadUInt32());
 			header.indexSize = DBPFUtil.ReverseBytes(br.ReadUInt32());
 
+			this.entryMap = new OrderedDictionary();
+			this.tgiMap = new Dictionary<uint, DBPFTGI>();
+
+
 			//Read Index Info
-			br.BaseStream.Seek(header.indexEntryOffset, SeekOrigin.Begin);
-			for (int idx = 0; idx < header.indexEntryCount; idx++) {
+			long len = br.BaseStream.Length;
+			br.BaseStream.Seek((header.indexEntryOffset >> 24), SeekOrigin.Begin);
+			for (int idx = 0; idx < (header.indexEntryCount >> 24); idx++) {
 				uint typeID = DBPFUtil.ReverseBytes(br.ReadUInt32()); // & (uint)4294967295; TODO - investigate what this does and why it's required
 				uint groupID = DBPFUtil.ReverseBytes(br.ReadUInt32()); // & (uint)4294967295; TODO - investigate what this does and why it's required
 				uint instanceID = DBPFUtil.ReverseBytes(br.ReadUInt32()); // & (uint)4294967295; TODO - investigate what this does and why it's required
@@ -168,6 +173,7 @@ namespace SC4DP2022_wpf {
 				uint size = DBPFUtil.ReverseBytes(br.ReadUInt32()); // & (uint)4294967295; TODO - investigate what this does and why it's required
 				DBPFTGI tgi = new DBPFTGI(typeID, groupID, instanceID);
 				//DirectDBPFEntry entry = new DirectDBPFEntry(tgi, offset, size, (uint) idx);
+				//entryMap.Add()
 			}
 
 			br.Close();
