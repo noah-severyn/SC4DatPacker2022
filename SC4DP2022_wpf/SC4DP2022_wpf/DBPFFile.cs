@@ -93,17 +93,17 @@ namespace SC4DP2022_wpf {
 			//empty constructor to prevent automatic creation of blank constructor and assigning default values to fields
 			public Header() { }
 
-			//public override string ToString() {
-			//	StringBuilder sb = new StringBuilder();
-			//	sb.Append($"Version: {majorVersion}.{minorVersion}; ");
-			//	sb.Append($"Created: {dateCreated}; "); // TODO - add functions to output these in a readable format - possibly functions in a util class?
-			//	sb.Append($"Modified: {dateModified}; "); // TODO - add functions to output these in a readable format - possibly functions in a util class?
-			//	sb.Append($"Index Major Version: {indexMajorVersion}; ");
-			//	sb.Append($"Index Entry Count: {indexEntryCount}; ");
-			//	sb.Append($"Index Offset Location: {indexEntryOffset}; ");
-			//	sb.Append($"Index Size: {indexSize}; ");
-			//	return sb.ToString();
-			//}
+			public override string ToString() {
+				StringBuilder sb = new StringBuilder();
+				sb.Append($"Version: {majorVersion}.{minorVersion}; ");
+				sb.Append($"Created: {dateCreated}; "); // TODO - add functions to output these in a readable format - possibly functions in a util class?
+				sb.Append($"Modified: {dateModified}; "); // TODO - add functions to output these in a readable format - possibly functions in a util class?
+				sb.Append($"Index Major Version: {indexMajorVersion}; ");
+				sb.Append($"Index Entry Count: {indexEntryCount}; ");
+				sb.Append($"Index Offset Location: {indexEntryOffset}; ");
+				sb.Append($"Index Size: {indexSize}; ");
+				return sb.ToString();
+			}
 		}
 
 		public override string ToString() { //TODO : Implement this?
@@ -167,7 +167,7 @@ namespace SC4DP2022_wpf {
 				uint offset = DBPFUtil.ReverseBytes(br.ReadUInt32()); // & (uint)4294967295; TODO - investigate what this does and why it's required
 				uint size = DBPFUtil.ReverseBytes(br.ReadUInt32()); // & (uint)4294967295; TODO - investigate what this does and why it's required
 				DBPFTGI tgi = new DBPFTGI(typeID, groupID, instanceID);
-				DirectDBPFEntry entry = new DirectDBPFEntry(tgi, offset, size, (uint) idx);
+				//DirectDBPFEntry entry = new DirectDBPFEntry(tgi, offset, size, (uint) idx);
 			}
 
 			br.Close();
@@ -192,33 +192,33 @@ namespace SC4DP2022_wpf {
 		//}
 
 
-		public class DirectDBPFEntry : DBPFEntry {
-			private readonly uint offset;
-			private readonly uint size;
-			private readonly uint index;
+		//public class DirectDBPFEntry : DBPFEntry {
+		//	private readonly uint offset;
+		//	private readonly uint size;
+		//	private readonly uint index;
 
-			//Create a DBPF entry
-			public DirectDBPFEntry(DBPFTGI tgi, uint offset, uint size, uint index) : base(tgi) {
-				this.offset = offset;
-				this.size = size;
-				this.index = index;
-			}
+		//	//Create a DBPF entry
+		//	public DirectDBPFEntry(DBPFTGI tgi, uint offset, uint size, uint index) : base(tgi) {
+		//		this.offset = offset;
+		//		this.size = size;
+		//		this.index = index;
+		//	}
 
-			//TODO - method equals is unimplemented in memo's code
-			//TODO - method hashCode is unimplemented in memo's code
-			public override string ToString() {
-				throw new NotImplementedException(); //TODO - implement this
-			}
-			public DBPFFile GetEncolsingDBPFFile() {
-				//return DBPFFile.this; //TODO - huh? this doesnt work
-				throw new NotImplementedException();
-			}
+		//	//TODO - method equals is unimplemented in memo's code
+		//	//TODO - method hashCode is unimplemented in memo's code
+		//	public override string ToString() {
+		//		throw new NotImplementedException(); //TODO - implement this
+		//	}
+		//	public DBPFFile GetEncolsingDBPFFile() {
+		//		//return DBPFFile.this; //TODO - huh? this doesnt work
+		//		throw new NotImplementedException();
+		//	}
 
-			public string ToDetailString() {
-				StringBuilder sb = new StringBuilder(ToString());
-				sb.AppendLine($"Offset: {DBPFUtil.ToHex(offset, 8)} Size: {size}");
-				return sb.ToString();
-			}
-		}
+		//	public string ToDetailString() {
+		//		StringBuilder sb = new StringBuilder(ToString());
+		//		sb.AppendLine($"Offset: {DBPFUtil.ToHex(offset, 8)} Size: {size}");
+		//		return sb.ToString();
+		//	}
+		//}
 	}
 }
