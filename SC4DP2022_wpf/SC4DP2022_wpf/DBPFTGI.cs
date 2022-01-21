@@ -72,7 +72,7 @@ namespace SC4DP2022_wpf {
 		public static readonly DBPFTGI INI; /** INI file (0, 0x8a5971c5, -1) */
 		public static readonly DBPFTGI NULLTGI; /** NULLTGI (-1, -1, -1) */
 
-		private DBPFTGI(uint type, uint group, uint instance) {
+		public DBPFTGI(uint type, uint group, uint instance) {
 			_type = type;
 			_group = group;
 			_instance = instance;
