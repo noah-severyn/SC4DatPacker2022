@@ -155,7 +155,7 @@ namespace SC4DP2022_wpf {
 			header.dateModified = DBPFUtil.ReverseBytes(br.ReadUInt32());
 			header.indexMajorVersion = DBPFUtil.ReverseBytes(br.ReadUInt32());
 			header.indexEntryCount = DBPFUtil.ReverseBytes(br.ReadUInt32());
-			header.indexEntryOffset = DBPFUtil.ReverseBytes(br.ReadUInt32());
+			header.indexEntryOffset = br.ReadUInt32(); //TODO - figure out why this works as it's different than all of the others ... unless none of the headers should be reversed???
 			header.indexSize = DBPFUtil.ReverseBytes(br.ReadUInt32());
 
 			this.entryMap = new OrderedDictionary();
@@ -164,13 +164,13 @@ namespace SC4DP2022_wpf {
 
 			//Read Index Info
 			long len = br.BaseStream.Length;
-			br.BaseStream.Seek((header.indexEntryOffset >> 24), SeekOrigin.Begin);
+			br.BaseStream.Seek((header.indexEntryOffset), SeekOrigin.Begin);
 			for (int idx = 0; idx < (header.indexEntryCount >> 24); idx++) {
-				uint typeID = DBPFUtil.ReverseBytes(br.ReadUInt32()); // & (uint)4294967295; TODO - investigate what this does and why it's required
-				uint groupID = DBPFUtil.ReverseBytes(br.ReadUInt32()); // & (uint)4294967295; TODO - investigate what this does and why it's required
-				uint instanceID = DBPFUtil.ReverseBytes(br.ReadUInt32()); // & (uint)4294967295; TODO - investigate what this does and why it's required
-				uint offset = DBPFUtil.ReverseBytes(br.ReadUInt32()); // & (uint)4294967295; TODO - investigate what this does and why it's required
-				uint size = DBPFUtil.ReverseBytes(br.ReadUInt32()); // & (uint)4294967295; TODO - investigate what this does and why it's required
+				uint typeID = DBPFUtil.ReverseBytes(br.ReadUInt32());
+				uint groupID = DBPFUtil.ReverseBytes(br.ReadUInt32());
+				uint instanceID = DBPFUtil.ReverseBytes(br.ReadUInt32());
+				uint offset = DBPFUtil.ReverseBytes(br.ReadUInt32());
+				uint size = DBPFUtil.ReverseBytes(br.ReadUInt32());
 				DBPFTGI tgi = new DBPFTGI(typeID, groupID, instanceID);
 				//DirectDBPFEntry entry = new DirectDBPFEntry(tgi, offset, size, (uint) idx);
 				//entryMap.Add()
