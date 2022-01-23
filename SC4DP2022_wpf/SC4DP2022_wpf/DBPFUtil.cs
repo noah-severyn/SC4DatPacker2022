@@ -46,14 +46,18 @@ namespace SC4DP2022_wpf {
 		}
 
 		/// <summary>
-		/// See: https://github.com/memo33/jDBPFX/blob/master/src/jdbpfx/util/DBPFUtil.java#L144
+		/// Returns a string representation of the provided uint converted to hex, padded by the specified number of places
 		/// </summary>
 		/// <param name="value"></param>
-		/// <param name="length"></param>
+		/// <param name="places"></param>
 		/// <returns></returns>
-		//public static string ToHex(uint value, int length) {
-		//	return string.Format("%0" + length + "X" + value);
-		//}
+		public static string UIntToHexString(uint value, int places) {
+			if (places < 0 || places > 8) {
+				throw new ArgumentOutOfRangeException("places", "Number of places must be between 0 and 8.");
+			}
+			
+			return value.ToString($"X{places}");
+		}
 
 	}
 }
