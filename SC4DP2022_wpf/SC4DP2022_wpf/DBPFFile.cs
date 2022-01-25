@@ -10,8 +10,9 @@ namespace SC4DP2022_wpf {
 	public class DBPFFile {
 		public Header header; //TODO - does this need to be sealed? How to modify Header to allow this?
 		public FileInfo file; //probably best to use the FileInfo object to better deal with IO errors
-		public OrderedDictionary entryMap; //TODO - implement entry map
-		public Dictionary<uint, DBPFTGI> tgiMap;//TODO - implement TGI map
+		public OrderedDictionary entryMap; //TODO - make these unmodifiable outside of this scope. see (Java) Collections.unmodifiableSet
+		public Dictionary<uint, DBPFTGI> tgiMap; //TODO - make these unmodifiable outside of this scope. see (Java) Collections.unmodifiableSet
+
 
 
 		public class Header {
@@ -111,36 +112,7 @@ namespace SC4DP2022_wpf {
 		}
 
 
-
-
-
-
-
-
-
 		public DBPFFile(string filePath) {
-			////read first 96 bytes of file
-			//byte[] headerBytes = new byte[96];
-			//FileStream fs = new FileStream(filePath, FileMode.Open);
-			//BinaryReader reader = new BinaryReader(fs);
-			//reader.BaseStream.Read(headerBytes, 0, 96);
-
-			//// https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/types/how-to-convert-a-byte-array-to-an-int
-			//if (BitConverter.IsLittleEndian) {
-			//	Array.Reverse(headerBytes);
-			//}
-			//Header header = new Header();
-			//this.header.identifier = BitConverter.ToUInt32(headerBytes, 92); //1145196614 int = 44425046 hex = DBPF ASCII
-			//this.header.majorVersion = BitConverter.ToUInt32(headerBytes, 88);
-			//this.header.minorVersion = BitConverter.ToUInt32(headerBytes, 84);
-			//this.header.dateCreated = BitConverter.ToUInt32(headerBytes, 68);
-			//this.header.dateModified = BitConverter.ToUInt32(headerBytes, 64);
-			//this.header.indexMajorVersion = BitConverter.ToUInt32(headerBytes, 60);
-			//this.header.indexEntryCount = BitConverter.ToUInt32(headerBytes, 56);
-			//this.header.indexEntryOffset = BitConverter.ToUInt32(headerBytes, 52);
-			//this.header.indexSize = BitConverter.ToUInt32(headerBytes, 48);
-
-
 			this.file = new FileInfo(filePath);
 			this.header = new Header();
 
@@ -169,33 +141,29 @@ namespace SC4DP2022_wpf {
 				uint typeID = DBPFUtil.ReverseBytes(br.ReadUInt32());
 				uint groupID = DBPFUtil.ReverseBytes(br.ReadUInt32());
 				uint instanceID = DBPFUtil.ReverseBytes(br.ReadUInt32());
-				uint offset = DBPFUtil.ReverseBytes(br.ReadUInt32());
+				uint offset = DBPFUtil.ReverseBytes(br.ReadUInt32()); //TODO - not reverse bytes here too???
 				uint size = DBPFUtil.ReverseBytes(br.ReadUInt32());
+
 				DBPFTGI tgi = new DBPFTGI(typeID, groupID, instanceID);
-				//DirectDBPFEntry entry = new DirectDBPFEntry(tgi, offset, size, (uint) idx);
-				//entryMap.Add()
+				DBPFEntry entry = new DBPFEntry(tgi, offset, size, (uint) idx);
+				AddEntry(entry);
+				Trace.WriteLine(tgi.ToString());
 			}
 
 			br.Close();
 			fs.Close();
 		}
 
-		//private void ReadHeader() {
-		//	FileStream fs = new FileStream(file.FullName, FileMode.Open);
-		//	BinaryReader br = new BinaryReader(fs);
-		//	header.identifier = DBPFUtil.ReverseBytes(br.ReadUInt32());
-		//	header.majorVersion = DBPFUtil.ReverseBytes(br.ReadUInt32());
-		//	header.minorVersion = DBPFUtil.ReverseBytes(br.ReadUInt32());
-		//	br.BaseStream.Seek(12, SeekOrigin.Current); //skip 8 unused bytes
-		//	header.dateCreated = DBPFUtil.ReverseBytes(br.ReadUInt32());
-		//	header.dateModified = DBPFUtil.ReverseBytes(br.ReadUInt32());
-		//	header.indexMajorVersion = DBPFUtil.ReverseBytes(br.ReadUInt32());
-		//	header.indexEntryCount = DBPFUtil.ReverseBytes(br.ReadUInt32());
-		//	header.indexEntryOffset = DBPFUtil.ReverseBytes(br.ReadUInt32());
-		//	header.indexSize = DBPFUtil.ReverseBytes(br.ReadUInt32());
-		//	br.Close();
-		//	fs.Close();
-		//}
+
+		private void AddEntry(DBPFEntry entry) {
+			if (entry == null) {
+				throw new ArgumentNullException();
+			}
+			entryMap.Add(entry.IndexPos, entry);
+			tgiMap.Add(entry.IndexPos, entry.TGI);
+		}
+
+		//TODO - implement read function, also readMapped https://github.com/memo33/jDBPFX/blob/master/src/jdbpfx/DBPFFile.java#L659
 
 
 		//public class DirectDBPFEntry : DBPFEntry {

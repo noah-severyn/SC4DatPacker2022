@@ -21,10 +21,29 @@ namespace SC4DP2022_wpf {
 				
 			}
 		}
+		private uint _index;
+
+		public uint IndexPos {
+			get { return _index; }
+			set { _index = value; }
+		}
+
 
 		// Constructor
 		public DBPFEntry(DBPFTGI tgi) {
 			_tgi = tgi;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="tgi"></param>
+		/// <param name="offset"></param>
+		/// <param name="size"></param>
+		/// <param name="index">Entry position in the file. 0-n</param>
+		public DBPFEntry(DBPFTGI tgi, uint offset, uint size, uint index) {
+			_tgi = tgi;
+			_index = index;
 		}
 
 
