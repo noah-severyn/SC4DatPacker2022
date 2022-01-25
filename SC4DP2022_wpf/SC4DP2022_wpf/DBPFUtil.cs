@@ -37,14 +37,17 @@ namespace SC4DP2022_wpf {
 
 
 		/// <summary>
-		/// Reverses the byte order for a uint. See:https://stackoverflow.com/a/18145923/10802255
+		/// Reverses the byte order for a uint. Example: 1697917002 (0x 65 34 28 4A) returns 1244148837 (0x 4A 28 34 65)
 		/// </summary>
-		/// <param name="value"></param>
+		/// <remarks>
+		/// See:https://stackoverflow.com/a/18145923/10802255
+		/// </remarks>
+		/// <param name="value">Integer value to reverse</param>
 		/// <returns></returns>
 		public static uint ReverseBytes(uint value) {
 			return (value & 0x000000FFU) << 24 | (value & 0x0000FF00U) << 8 | (value & 0x00FF0000U) >> 8 | (value & 0xFF000000U) >> 24;
 		}
-
+		
 		/// <summary>
 		/// Returns a string representation of the provided uint converted to hex, padded by the specified number of places
 		/// </summary>

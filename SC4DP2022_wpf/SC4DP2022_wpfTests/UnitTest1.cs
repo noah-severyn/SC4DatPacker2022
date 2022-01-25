@@ -25,6 +25,12 @@ namespace SC4DP2022_wpfTests {
 		}
 
 		[TestMethod]
+		public void Test_001_DBPFUtilTests() {
+			//TODO - implement this
+			//Assert.AreEqual((uint) 1244148837, )
+		}//Example: 1697917002 (0x 65 34 28 4A) returns 1244148837 (0x 4A 28 34 65)
+
+		[TestMethod]
 		public void Test_001_ValidDBPF() {
 			//These should pass : valid DBPF file
 			//DBPFFile dbpf = new DBPFFile("C:\\Users\\Administrator\\Documents\\SimCity 4\\Plugins\\mntoes\\Bournemouth Housing Pack\\Mntoes-Bournemouth Housing Pack.dat");
@@ -45,5 +51,19 @@ namespace SC4DP2022_wpfTests {
 
 
 		}
+
+
+		[TestMethod]
+		public void Test_110_ParseHeader() {
+
+		}
+
+
+		[TestMethod]
+		public void Test_210_ParseIndex() {
+
+		}
 	}
+
+	
 }
