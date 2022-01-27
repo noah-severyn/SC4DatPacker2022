@@ -8,7 +8,7 @@ namespace SC4DP2022_wpf {
 	/// <summary>
 	/// An absract form on an entry of a DBPFFile, representing an instance of a subfile that may be contained in a DBPF file
 	/// </summary>
-	class DBPFEntry {
+	public class DBPFEntry {
 		private DBPFTGI _tgi;
 		public DBPFTGI TGI {
 			get { return _tgi; }
