@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 
 namespace SC4DP2022_wpf {
-	static class DBPFUtil {
+	public static class DBPFUtil {
 		private static readonly string[] sc4Extensions = { "dat", "sc4lot", "sc4desc", "sc4model" };
 
 
