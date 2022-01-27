@@ -4,31 +4,26 @@ using SC4DP2022_wpf;
 
 namespace SC4DP2022_wpfTests {
 	[TestClass]
-	public class UnitTest1 {
+	public class DBPFUnitTests {
+
+
 		[TestMethod]
-		public void Test_000_BitShiftTest() {
-			uint start = 1697917002;
-			uint value = start & 0x000000FFU;
-			value = value << 24;
-
-			uint value2 = start & 0x0000FF00U;
-			value2 = value2 << 8;
-
-			uint value3 = start & 0x00FF0000U;
-			value3 = value3 >> 8;
-
-			uint value4 = start & 0xFF000000U;
-			value4 = value4 >> 24;
-
-			uint end = value | value2 | value3 | value4;
-			Assert.IsTrue(true);
+		public void Test_011_DBPFUtil_ReverseBytes() {
+			//Example: 1697917002 (0x 65 34 28 4A) returns 1244148837 (0x 4A 28 34 65)
+			Assert.AreEqual((uint) 1244148837, DBPFUtil.ReverseBytes(1697917002));
+			Assert.AreEqual((uint) 0x4a283465, DBPFUtil.ReverseBytes(0x6534284a));
+			Assert.AreEqual((uint) 0, DBPFUtil.ReverseBytes(0));
 		}
 
 		[TestMethod]
-		public void Test_001_DBPFUtilTests() {
-			//TODO - implement this
-			//Assert.AreEqual((uint) 1244148837, )
-		}//Example: 1697917002 (0x 65 34 28 4A) returns 1244148837 (0x 4A 28 34 65)
+		public void Test_012_DBPFUtil_UintToHexString() {
+			Assert.AreEqual("6534284A", DBPFUtil.UIntToHexString(1697917002,8));
+			Assert.AreEqual("4A283465", DBPFUtil.UIntToHexString(1244148837, 8));
+			Assert.AreEqual("6534284A", DBPFUtil.UIntToHexString(0x6534284A, 8));
+			Assert.AreEqual("4A283465", DBPFUtil.UIntToHexString(0x4A283465, 8));
+			Assert.AreEqual("4D2", DBPFUtil.UIntToHexString(1234, 3));
+			Assert.AreEqual("000004D2", DBPFUtil.UIntToHexString(1234, 8));
+		}
 
 		[TestMethod]
 		public void Test_050_DBPFTGI_Equals() {
