@@ -1,32 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Text;
 
 //See: https://github.com/memo33/jDBPFX/blob/master/src/jdbpfx/DBPFTGI.java
 namespace SC4DP2022_wpf {
 	public class DBPFTGI {
-		private readonly uint _type;
-		public uint type {
-			get { return _type; }
-			//set { myVar = value; }
-		}
-		private readonly uint _group;
-		public uint group {
-			get { return _group; }
-			//set { myVar = value; }
-		}
-		private readonly uint _instance;
-		public uint instance {
-			get { return _instance; }
-			//set { myVar = value; }
-		}
-		private readonly uint _label;
-		public uint label {
-			get { return _label; }
-			//set { _label = value; }
-		}
-
-
+		private static readonly SortedDictionary<DBPFTGI, string> knownEntries = new SortedDictionary<DBPFTGI, string>();
 		public static readonly DBPFTGI BLANKTGI; /** BLANKTGI (0, 0, 0) */
 		public static readonly DBPFTGI DIRECTORY; /** Directory file (0xe86b1eef, 0xe86b1eef, 0x286b1f03) */
 		public static readonly DBPFTGI LD; /** LD file (0x6be74c60, 0x6be74c60, 0) */
@@ -72,11 +52,43 @@ namespace SC4DP2022_wpf {
 		public static readonly DBPFTGI INI; /** INI file (0, 0x8a5971c5, 0) */
 		public static readonly DBPFTGI NULLTGI; /** NULLTGI (0, 0, 0) */
 
+
+
+
+		private readonly uint _type;
+		public uint type {
+			get { return _type; }
+			//set { myVar = value; }
+		}
+		private readonly uint _group;
+		public uint group {
+			get { return _group; }
+			//set { myVar = value; }
+		}
+		private readonly uint _instance;
+		public uint instance {
+			get { return _instance; }
+			//set { myVar = value; }
+		}
+		private readonly string _label;
+		public string label {
+			get { return _label; }
+		}
+
+		private string _labelshort;
+		public string shortLabel {
+			get { return _labelshort; }
+		}
+
 		public DBPFTGI(uint type, uint group, uint instance) {
 			_type = type;
 			_group = group;
 			_instance = instance;
+
+			//TODO - call matches here to set label field
 		}
+
+		
 
 
 		public string GetLabel() {
@@ -98,83 +110,148 @@ namespace SC4DP2022_wpf {
 		/// </summary>
 		/// <param name="tgi"></param>
 		/// <returns></returns>
-		private string TGIMatchesKnownType(DBPFTGI tgi) {
+		/// 		//"The method {@link DBPFTGI#matches(DBPFTGI)} may be used to determine whether a TGI matches a particular format, that is, a known file type."
+		private bool MatchesKnownEntry(DBPFTGI tgi) {
+			string result;
+			if (knownEntries.TryGetValue(tgi, out result)) {
+				_labelshort = result;
+				return true;
+			}
+			else {
+				_labelshort = "NULLTGI";
+				return false;
+			}
+		}
 
+		/// <summary>
+		/// Tests for equality of DBPFTGI objects by comparing T, G, I of each. This method is reflexive.
+		/// </summary>
+		/// <param name="obj">Any object to compare</param>
+		/// <returns></returns>
+		public override bool Equals(object obj) {
+			if (obj is DBPFTGI) {
+				DBPFTGI checkTGI = (DBPFTGI) obj;
+				return this.type == checkTGI.type && this.group == checkTGI.group && this.instance == checkTGI.instance;
+			}
+			else {
+				return false;
+			}
 
-			return null;
 		}
 
 		public override string ToString() {
-			return $"T:{_type} 0x{DBPFUtil.UIntToHexString(_type,8)} G:{_group} 0x{DBPFUtil.UIntToHexString(_group, 8)} I:{_instance} 0x{DBPFUtil.UIntToHexString(_instance, 8)}";	
+			return $"T:{_type} 0x{DBPFUtil.UIntToHexString(_type, 8)}, G:{_group} 0x{DBPFUtil.UIntToHexString(_group, 8)}, I:{_instance} 0x{DBPFUtil.UIntToHexString(_instance, 8)}";
 		}
 
 
 
 
+		/// <summary>
+		/// This constructor only to be used to declare known TGI types in the static constructor.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <param name="group"></param>
+		/// <param name="instance"></param>
+		/// <param name="label"></param>
+		private DBPFTGI(uint type, uint group, uint instance, string label) {
+			_type = type;
+			_group = group;
+			_instance = instance;
+			_label = label;
+		}
 
+		//This static constructor will be called as soon as the class is loaded into memory, and not necessarily when an object is created.
+		//Known types need to be ordered "bottom-up", that is, specialized entries need to be inserted first, more general ones later.
+		static DBPFTGI() {
+			BLANKTGI = new DBPFTGI(0, 0, 0, "-");
+			DIRECTORY = new DBPFTGI(0xe86b1eef, 0xe86b1eef, 0x286b1f03, "DIR");
+			LD = new DBPFTGI(0x6be74c60, 0x6be74c60, 0, "LD");
+			S3D_MAXIS = new DBPFTGI(0x5ad0e817, 0xbadb57f1, 0, "S3D");
+			S3D = new DBPFTGI(0x5ad0e817, 0, 0, "S3D");
+			COHORT = new DBPFTGI(0x05342861, 0, 0, "COHORT");
+			EXEMPLAR_ROAD = new DBPFTGI(0x6534284a, 0x2821ed93, 0, "EXEMPLAR (Road)");
+			EXEMPLAR_STREET = new DBPFTGI(0x6534284a, 0xa92a02ea, 0, "EXEMPLAR (Street)");
+			EXEMPLAR_ONEWAYROAD = new DBPFTGI(0x6534284a, 0xcbe084cb, 0, "EXEMPLAR (One-Way Road)");
+			EXEMPLAR_AVENUE = new DBPFTGI(0x6534284a, 0xcb730fac, 0, "EXEMPLAR (Avenue)");
+			EXEMPLAR_HIGHWAY = new DBPFTGI(0x6534284a, 0xa8434037, 0, "EXEMPLAR (Highway)");
+			EXEMPLAR_GROUNDHIGHWAY = new DBPFTGI(0x6534284a, 0xebe084d1, 0, "EXEMPLAR (Ground Highway)");
+			EXEMPLAR_DIRTROAD = new DBPFTGI(0x6534284a, 0x6be08658, 0, "EXEMPLAR (Dirtroad)");
+			EXEMPLAR_RAIL = new DBPFTGI(0x6534284a, 0xe8347989, 0, "EXEMPLAR (Rail)");
+			EXEMPLAR_LIGHTRAIL = new DBPFTGI(0x6534284a, 0x2b79dffb, 0, "EXEMPLAR (Lightrail)");
+			EXEMPLAR_MONORAIL = new DBPFTGI(0x6534284a, 0xebe084c2, 0, "EXEMPLAR (Monorail)");
+			EXEMPLAR_POWERPOLE = new DBPFTGI(0x6534284a, 0x088e1962, 0, "EXEMPLAR (Power Pole)");
+			EXEMPLAR_T21 = new DBPFTGI(0x6534284a, 0x89ac5643, 0, "EXEMPLAR (T21)");
+			EXEMPLAR = new DBPFTGI(0x6534284a, 0, 0, "EXEMPLAR");
+			FSH_MISC = new DBPFTGI(0x7ab50e44, 0x1abe787d, 0, "FSH (Misc)");
+			FSH_TRANSIT = new DBPFTGI(0x7ab50e44, 0x1abe787d, 0, "FSH (Misc)");
+			FSH_BASE_OVERLAY = new DBPFTGI(0x7ab50e44, 0x0986135e, 0, "FSH (Base/Overlay Texture)");
+			FSH_SHADOW = new DBPFTGI(0x7ab50e44, 0x2bC2759a, 0, "FSH (Shadow DBPFTGI)"),;
+			FSH_ANIM_PROPS = new DBPFTGI(0x7ab50e44, 0x2a2458f9, 0, "FSH (Animation Sprites (Props)");
+			FSH_ANIM_NONPROPS = new DBPFTGI(0x7ab50e44, 0x49a593e7, 0, "FSH (Animation Sprites (Non Props)");
+			FSH_TERRAIN_FOUNDATION = new DBPFTGI(0x7ab50e44, 0x891b0e1a, 0, "FSH (Terrain/Foundation)");
+			FSH_UI = new DBPFTGI(0x7ab50e44, 0x46a006b0, 0, "FSH (UI Image)");
+			FSH = new DBPFTGI(0x7ab50e44, 0, 0, "FSH");
+			SC4PATH_2D = new DBPFTGI(0x296678f7, 0x69668828, 0, "SC4PATH (2D)");
+			SC4PATH_3D = new DBPFTGI(0x296678f7, 0xa966883f, 0, "SC4PATH (3D)");
+			SC4PATH = new DBPFTGI(0x296678f7, 0, 0, "SC4PATH");
+			PNG_ICON = new DBPFTGI(0x856ddbac, 0x6a386d26, 0, "PNG (Icon)");
+			PNG = new DBPFTGI(0x856ddbac, 0, 0, "PNG");
+			LUA = new DBPFTGI(0xca63e2a3, 0x4a5e8ef6, 0, "LUA");
+			LUA_GEN = new DBPFTGI(0xca63e2a3, 0x4a5e8f3f, 0, "LUA (Generators)");
+			WAV = new DBPFTGI(0x2026960b, 0xaa4d1933, 0, "WAV");
+			LTEXT = new DBPFTGI(0x2026960b, 0, 0, "LTEXT");
+			INI_FONT = new DBPFTGI(0, 0x4a87bfe8, 0x2a87bffc, "INI (Font Table)");
+			INI_NETWORK = new DBPFTGI(0, 0x8a5971c5, 0x8a5993b9, "INI (Networks)");
+			INI = new DBPFTGI(0, 0x8a5971c5, 0, "INI");
+			RUL = new DBPFTGI(0x0a5bcf4b, 0xaa5bcf57, 0, "RUL");
+			EFFDIR = new DBPFTGI(0xea5118b0, 0, 0, "EFFDIR");
+			NULLTGI = new DBPFTGI(0, 0, 0, "UNKNOWN");
+			
+			knownEntries.Add(BLANKTGI, "BLANKTGI");
+			knownEntries.Add(DIRECTORY, "DIRECTORY");
+			knownEntries.Add(LD, "LD");
+			knownEntries.Add(S3D_MAXIS, "S3D_MAXIS");
+			knownEntries.Add(S3D, "S3D");
+			knownEntries.Add(COHORT, "COHORT");
+			knownEntries.Add(EXEMPLAR_ROAD, "EXEMPLAR_ROAD");
+			knownEntries.Add(EXEMPLAR_STREET, "EXEMPLAR_STREET");
+			knownEntries.Add(EXEMPLAR_ONEWAYROAD, "EXEMPLAR_ONEWAYROAD");
+			knownEntries.Add(EXEMPLAR_AVENUE, "EXEMPLAR_AVENUE");
+			knownEntries.Add(EXEMPLAR_HIGHWAY, "EXEMPLAR_HIGHWAY");
+			knownEntries.Add(EXEMPLAR_GROUNDHIGHWAY, "EXEMPLAR_GROUNDHIGHWAY");
+			knownEntries.Add(EXEMPLAR_DIRTROAD, "EXEMPLAR_DIRTROAD");
+			knownEntries.Add(EXEMPLAR_RAIL, "EXEMPLAR_RAIL");
+			knownEntries.Add(EXEMPLAR_LIGHTRAIL, "EXEMPLAR_LIGHTRAIL");
+			knownEntries.Add(EXEMPLAR_MONORAIL, "EXEMPLAR_MONORAIL");
+			knownEntries.Add(EXEMPLAR_POWERPOLE, "EXEMPLAR_POWERPOLE");
+			knownEntries.Add(EXEMPLAR_T21, "EXEMPLAR_T21");
+			knownEntries.Add(EXEMPLAR, "EXEMPLAR");
+			knownEntries.Add(FSH_MISC, "FSH_MISC");
+			knownEntries.Add(FSH_TRANSIT, "FSH_TRANSIT");
+			knownEntries.Add(FSH_BASE_OVERLAY, "FSH_BASE_OVERLAY");
+			knownEntries.Add(FSH_SHADOW, "FSH_SHADOW");
+			knownEntries.Add(FSH_ANIM_PROPS, "FSH_ANIM_PROPS");
+			knownEntries.Add(FSH_ANIM_NONPROPS, "FSH_ANIM_NONPROPS");
+			knownEntries.Add(FSH_TERRAIN_FOUNDATION, "FSH_TERRAIN_FOUNDATION");
+			knownEntries.Add(FSH_UI, "FSH_UI");
+			knownEntries.Add(FSH, "FSH");
+			knownEntries.Add(SC4PATH_2D, "SC4PATH_2D");
+			knownEntries.Add(SC4PATH_3D, "SC4PATH_3D");
+			knownEntries.Add(SC4PATH, "SC4PATH");
+			knownEntries.Add(PNG_ICON, "PNG_ICON");
+			knownEntries.Add(PNG, "PNG");
+			knownEntries.Add(LUA, "LUA");
+			knownEntries.Add(LUA_GEN, "LUA_GEN");
+			knownEntries.Add(WAV, "WAV");
+			knownEntries.Add(LTEXT, "LTEXT");
+			knownEntries.Add(INI_FONT, "INI_FONT");
+			knownEntries.Add(INI_NETWORK, "INI_NETWORK");
+			knownEntries.Add(INI, "INI");
+			knownEntries.Add(RUL, "RUL");
+			knownEntries.Add(EFFDIR, "EFFDIR");
+			knownEntries.Add(NULLTGI, "NULLTGI"); // any TGI matches this last one
+		}
 
-
-
-		//Regarding the code below, I'm not sure what to do with it. this is how memo implemented it, but I'm not entirely sure how it works or why it works this way. can it be better done as a simple dictionary instead? i think all he's trying to do is create specific types of DBPFTGI with the given values, so would it not be simpler to add them into a dictionary and throw the dictionary in the constructor? i think it would accomplish the same thing and it makes more sense to me....but i need to study how these are used more closely to be sure that would work.
-		//"The method {@link DBPFTGI#matches(DBPFTGI)} may be used to determine whether a TGI matches a particular format, that is, a known file type."
-
-		////This static constructor will be called as soon as the class is loaded into memory, and not necessarily when an object is created
-		//static DBPFTGI() { 
-		//	 //Masks need to be ordered "bottom-up", that is, specialized entries need to be inserted first, more general ones later.
-		//	BLANKTGI = new TGILookup(0, 0, 0, "-");
-		//	DIRECTORY = new TGILookup(0xe86b1eef, 0xe86b1eef, 0x286b1f03, "DIR");
-		//	LD = new TGILookup(0x6be74c60, 0x6be74c60, 0, "LD");
-		//	S3D_MAXIS = new TGILookup(0x5ad0e817, 0xbadb57f1, 0, "S3D");
-		//	S3D = new TGILookup(0x5ad0e817, 0, 0, "S3D");
-		//	COHORT = new TGILookup(0x05342861, 0, 0, "COHORT");
-		//	EXEMPLAR_ROAD = new TGILookup(0x6534284a, 0x2821ed93, 0, "EXEMPLAR (Road)");
-		//	EXEMPLAR_STREET = new TGILookup(0x6534284a, 0xa92a02ea, 0, "EXEMPLAR (Street)");
-		//	EXEMPLAR_ONEWAYROAD = new TGILookup(0x6534284a, 0xcbe084cb, 0, "EXEMPLAR (One-Way Road)");
-		//	EXEMPLAR_AVENUE = new TGILookup(0x6534284a, 0xcb730fac, 0, "EXEMPLAR (Avenue)");
-		//	EXEMPLAR_HIGHWAY = new TGILookup(0x6534284a, 0xa8434037, 0, "EXEMPLAR (Highway)");
-		//	EXEMPLAR_GROUNDHIGHWAY = new TGILookup(0x6534284a, 0xebe084d1, 0, "EXEMPLAR (Ground Highway)");
-		//	EXEMPLAR_DIRTROAD = new TGILookup(0x6534284a, 0x6be08658, 0, "EXEMPLAR (Dirtroad)");
-		//	EXEMPLAR_RAIL = new TGILookup(0x6534284a, 0xe8347989, 0, "EXEMPLAR (Rail)");
-		//	EXEMPLAR_LIGHTRAIL = new TGILookup(0x6534284a, 0x2b79dffb, 0, "EXEMPLAR (Lightrail)");
-		//	EXEMPLAR_MONORAIL = new TGILookup(0x6534284a, 0xebe084c2, 0, "EXEMPLAR (Monorail)");
-		//	EXEMPLAR_POWERPOLE = new TGILookup(0x6534284a, 0x088e1962, 0, "EXEMPLAR (Power Pole)");
-		//	EXEMPLAR_T21 = new TGILookup(0x6534284a, 0x89ac5643, 0, "EXEMPLAR (T21)");
-		//	EXEMPLAR = new TGILookup(0x6534284a, 0, 0, "EXEMPLAR");
-		//	FSH_MISC = new TGILookup(0x7ab50e44, 0x1abe787d, 0, "FSH (Misc)");
-		//	FSH_TRANSIT = FSH_MISC;
-		//	FSH_BASE_OVERLAY = new TGILookup(0x7ab50e44, 0x0986135e, 0, "FSH (Base/Overlay Texture)");
-		//	FSH_SHADOW = new TGILookup(0x7ab50e44, 0x2BC2759a, 0, "FSH (Shadow TGILookup)");
-		//	FSH_ANIM_PROPS = new TGILookup(0x7ab50e44, 0x2a2458f9, 0, "FSH (Animation Sprites (Props))");
-		//	FSH_ANIM_NONPROPS = new TGILookup(0x7ab50e44, 0x49a593e7, 0, "FSH (Animation Sprites (Non Props))");
-		//	FSH_TERRAIN_FOUNDATION = new TGILookup(0x7ab50e44, 0x891b0e1a, 0, "FSH (Terrain/Foundation)");
-		//	FSH_UI = new TGILookup(0x7ab50e44, 0x46a006b0, 0, "FSH (UI Image)");
-		//	FSH = new TGILookup(0x7ab50e44, 0, 0, "FSH");
-		//	SC4PATH_2D = new TGILookup(0x296678f7, 0x69668828, 0, "SC4PATH (2D)");
-		//	SC4PATH_3D = new TGILookup(0x296678f7, 0xa966883f, 0, "SC4PATH (3D)");
-		//	SC4PATH = new TGILookup(0x296678f7, 0, 0, "SC4PATH");
-		//	PNG_ICON = new TGILookup(0x856ddbac, 0x6a386d26, 0, "PNG (Icon)");
-		//	PNG = new TGILookup(0x856ddbac, 0, 0, "PNG");
-		//	LUA = new TGILookup(0xca63e2a3, 0x4a5e8ef6, 0, "LUA");
-		//	LUA_GEN = new TGILookup(0xca63e2a3, 0x4a5e8f3f, 0, "LUA (Generators)");
-		//	WAV = new TGILookup(0x2026960b, 0xaa4d1933, 0, "WAV");
-		//	LTEXT = new TGILookup(0x2026960b, 0, 0, "LTEXT");
-		//	INI_FONT = new TGILookup(0, 0x4a87bfe8, 0x2a87bffc, "INI (Font Table)");
-		//	INI_NETWORK = new TGILookup(0, 0x8a5971c5, 0x8a5993b9, "INI (Networks)");
-		//	INI = new TGILookup(0, 0x8a5971c5, 0, "INI");
-		//	RUL = new TGILookup(0x0a5bcf4b, 0xaa5bcf57, 0, "RUL");
-		//	EFFDIR = new TGILookup(0xea5118b0, 0, 0, "EFFDIR");
-		//	NULLTGI = new TGILookup(0, 0, 0, "UNKNOWN"); // any TGI matches this last one
-		//}
-
-		//private class TGILookup : DBPFTGI {
-		//	private string label;
-		//	public readonly Queue<TGILookup> values = new Queue<TGILookup>(); //Use a queue for ordered iteration
-
-		//	public TGILookup(uint type, uint group, uint instance, string label) : base(type, group, instance) {
-		//		this.label = label;
-		//		values.Enqueue(this);
-		//	}
-		//}
 	}
 
 }
