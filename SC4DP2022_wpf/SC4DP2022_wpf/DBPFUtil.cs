@@ -47,19 +47,23 @@ namespace SC4DP2022_wpf {
 		public static uint ReverseBytes(uint value) {
 			return (value & 0x000000FFU) << 24 | (value & 0x0000FF00U) << 8 | (value & 0x00FF0000U) >> 8 | (value & 0xFF000000U) >> 24;
 		}
-		
+
 		/// <summary>
 		/// Returns a string representation of the provided uint converted to hex, padded by the specified number of places
 		/// </summary>
-		/// <param name="value"></param>
-		/// <param name="places"></param>
+		/// <param name="value">Value to return</param>
+		/// <param name="places">Number of places to pad the value. Should usually be 8. 0-8 valid.</param>
 		/// <returns></returns>
-		public static string UIntToHexString(uint value, int places) {
+		public static string UIntToHexString(uint? value, int places) {
 			if (places < 0 || places > 8) {
 				throw new ArgumentOutOfRangeException("places", "Number of places must be between 0 and 8.");
 			}
+			if (value != null) {
+				return ((uint) value).ToString($"X{places}");
+			} else {
+				return value.ToString();
+			}
 			
-			return value.ToString($"X{places}");
 		}
 
 	}

@@ -57,18 +57,18 @@ namespace SC4DP2022_wpf {
 
 
 
-		private readonly uint _type;
-		public uint type {
+		private readonly uint? _type;
+		public uint? type {
 			get { return _type; }
 			//set { myVar = value; }
 		}
-		private readonly uint _group;
-		public uint group {
+		private readonly uint? _group;
+		public uint? group {
 			get { return _group; }
 			//set { myVar = value; }
 		}
-		private readonly uint _instance;
-		public uint instance {
+		private readonly uint? _instance;
+		public uint? instance {
 			get { return _instance; }
 			//set { myVar = value; }
 		}
@@ -82,6 +82,7 @@ namespace SC4DP2022_wpf {
 			get { return _labelshort; }
 		}
 
+		//should never allow creation of null TID GID IID because they interfere with the lookups of knownType
 		public DBPFTGI(uint type, uint group, uint instance) {
 			_type = type;
 			_group = group;
@@ -90,22 +91,22 @@ namespace SC4DP2022_wpf {
 			//TODO - call matches here to set label field
 		}
 
-		
 
 
-		public string GetLabel() {
-			return null;
-		}
 
-		public bool IsTypeZero() {
-			return this.type == 0;
-		}
-		public bool IsGroupZero() {
-			return this.group == 0;
-		}
-		public bool IsInstanceZero() {
-			return this.instance == 0;
-		}
+		//public string GetLabel() {
+		//	return null;
+		//}
+
+		//public bool IsTypeNull() {
+		//	return this.type == null;
+		//}
+		//public bool IsGroupNull() {
+		//	return this.group == null;
+		//}
+		//public bool IsInstanceNull() {
+		//	return this.instance == null;
+		//}
 
 		/// <summary>
 		/// Check if this TGI matches a DBPFTGI set of knownType. Unlike equals, this method is not reflexive.
@@ -117,16 +118,32 @@ namespace SC4DP2022_wpf {
 		/// <param name="tgi">A DBPFTGI to check against</param>
 		/// <returns>TRUE if check passes; FALSE otherwise</returns>
 		public bool MatchesKnownTGI(DBPFTGI knownType) {
-			bool isTIDok, isGIDok, isIIDok, temp;
+			bool isTIDok, isGIDok, isIIDok, t2;
 
-			//capture specific case if knownType is BLANKTGI or NULLTGI
+			if (knownType.type.HasValue) {
+				t2 = this.type == knownType.type;
+			}
+			else {
+				t2 = true;
+			}
+			isTIDok = t2; //TODO - condense this down into boolean logic
 
-			temp = this.type == knownType.type;
-			isTIDok = knownType.IsTypeZero() || this.type == knownType.type;
-			temp = this.group == knownType.group;
-			isGIDok = knownType.IsGroupZero() || this.group == knownType.group;
-			temp = this.instance == knownType.instance;
-			isIIDok = knownType.IsInstanceZero() || this.instance == knownType.instance;
+			if (knownType.group.HasValue) {
+				t2 = this.group == knownType.group;
+			}
+			else {
+				t2 = true;
+			}
+			isGIDok = t2;
+
+			if (knownType.instance.HasValue) {
+				t2 = this.instance == knownType.instance;
+			}
+			else {
+				t2 = true;
+			}
+			isIIDok = t2;
+
 			return isTIDok && isGIDok && isIIDok;
 		}
 
@@ -160,7 +177,7 @@ namespace SC4DP2022_wpf {
 		/// <param name="group"></param>
 		/// <param name="instance"></param>
 		/// <param name="label"></param>
-		private DBPFTGI(uint type, uint group, uint instance, string label) {
+		private DBPFTGI(uint? type, uint? group, uint? instance, string label) {
 			_type = type;
 			_group = group;
 			_instance = instance;
@@ -170,50 +187,54 @@ namespace SC4DP2022_wpf {
 		//This static constructor will be called as soon as the class is loaded into memory, and not necessarily when an object is created.
 		//Known types need to be ordered "bottom-up", that is, specialized entries need to be inserted first, more general ones later.
 		static DBPFTGI() {
-			BLANKTGI = new DBPFTGI(0, 0, 0, "-"); //QUESTION - it might be an issue that blank components are set to 0?? Possibly redesign but how else to do it using uint? max value?
+			BLANKTGI = new DBPFTGI(0, 0, 0, "-");
 			DIRECTORY = new DBPFTGI(0xe86b1eef, 0xe86b1eef, 0x286b1f03, "DIR");
-			LD = new DBPFTGI(0x6be74c60, 0x6be74c60, 0, "LD");
-			S3D_MAXIS = new DBPFTGI(0x5ad0e817, 0xbadb57f1, 0, "S3D");
-			S3D = new DBPFTGI(0x5ad0e817, 0, 0, "S3D");
-			COHORT = new DBPFTGI(0x05342861, 0, 0, "COHORT");
-			EXEMPLAR_ROAD = new DBPFTGI(0x6534284a, 0x2821ed93, 0, "EXEMPLAR (Road)");
-			EXEMPLAR_STREET = new DBPFTGI(0x6534284a, 0xa92a02ea, 0, "EXEMPLAR (Street)");
-			EXEMPLAR_ONEWAYROAD = new DBPFTGI(0x6534284a, 0xcbe084cb, 0, "EXEMPLAR (One-Way Road)");
-			EXEMPLAR_AVENUE = new DBPFTGI(0x6534284a, 0xcb730fac, 0, "EXEMPLAR (Avenue)");
-			EXEMPLAR_HIGHWAY = new DBPFTGI(0x6534284a, 0xa8434037, 0, "EXEMPLAR (Highway)");
-			EXEMPLAR_GROUNDHIGHWAY = new DBPFTGI(0x6534284a, 0xebe084d1, 0, "EXEMPLAR (Ground Highway)");
-			EXEMPLAR_DIRTROAD = new DBPFTGI(0x6534284a, 0x6be08658, 0, "EXEMPLAR (Dirtroad)");
-			EXEMPLAR_RAIL = new DBPFTGI(0x6534284a, 0xe8347989, 0, "EXEMPLAR (Rail)");
-			EXEMPLAR_LIGHTRAIL = new DBPFTGI(0x6534284a, 0x2b79dffb, 0, "EXEMPLAR (Lightrail)");
-			EXEMPLAR_MONORAIL = new DBPFTGI(0x6534284a, 0xebe084c2, 0, "EXEMPLAR (Monorail)");
-			EXEMPLAR_POWERPOLE = new DBPFTGI(0x6534284a, 0x088e1962, 0, "EXEMPLAR (Power Pole)");
-			EXEMPLAR_T21 = new DBPFTGI(0x6534284a, 0x89ac5643, 0, "EXEMPLAR (T21)");
-			EXEMPLAR = new DBPFTGI(0x6534284a, 0, 0, "EXEMPLAR");
-			FSH_MISC = new DBPFTGI(0x7ab50e44, 0x1abe787d, 0, "FSH (Misc)");
-			FSH_TRANSIT = new DBPFTGI(0x7ab50e44, 0x1abe787d, 0, "FSH (Misc)");
-			FSH_BASE_OVERLAY = new DBPFTGI(0x7ab50e44, 0x0986135e, 0, "FSH (Base/Overlay Texture)");
-			FSH_SHADOW = new DBPFTGI(0x7ab50e44, 0x2bC2759a, 0, "FSH (Shadow DBPFTGI)");
-			FSH_ANIM_PROPS = new DBPFTGI(0x7ab50e44, 0x2a2458f9, 0, "FSH (Animation Sprites (Props)");
-			FSH_ANIM_NONPROPS = new DBPFTGI(0x7ab50e44, 0x49a593e7, 0, "FSH (Animation Sprites (Non Props)");
-			FSH_TERRAIN_FOUNDATION = new DBPFTGI(0x7ab50e44, 0x891b0e1a, 0, "FSH (Terrain/Foundation)");
-			FSH_UI = new DBPFTGI(0x7ab50e44, 0x46a006b0, 0, "FSH (UI Image)");
-			FSH = new DBPFTGI(0x7ab50e44, 0, 0, "FSH");
-			SC4PATH_2D = new DBPFTGI(0x296678f7, 0x69668828, 0, "SC4PATH (2D)");
-			SC4PATH_3D = new DBPFTGI(0x296678f7, 0xa966883f, 0, "SC4PATH (3D)");
-			SC4PATH = new DBPFTGI(0x296678f7, 0, 0, "SC4PATH");
-			PNG_ICON = new DBPFTGI(0x856ddbac, 0x6a386d26, 0, "PNG (Icon)");
-			PNG = new DBPFTGI(0x856ddbac, 0, 0, "PNG");
-			LUA = new DBPFTGI(0xca63e2a3, 0x4a5e8ef6, 0, "LUA");
-			LUA_GEN = new DBPFTGI(0xca63e2a3, 0x4a5e8f3f, 0, "LUA (Generators)");
-			WAV = new DBPFTGI(0x2026960b, 0xaa4d1933, 0, "WAV");
-			LTEXT = new DBPFTGI(0x2026960b, 0, 0, "LTEXT");
+			LD = new DBPFTGI(0x6be74c60, 0x6be74c60, null, "LD");
+			S3D_MAXIS = new DBPFTGI(0x5ad0e817, 0xbadb57f1, null, "S3D");
+			S3D = new DBPFTGI(0x5ad0e817, null, null, "S3D");
+			COHORT = new DBPFTGI(0x05342861, null, null, "COHORT");
+
+			EXEMPLAR_ROAD = new DBPFTGI(0x6534284a, 0x2821ed93, null, "EXEMPLAR (Road)");
+			EXEMPLAR_STREET = new DBPFTGI(0x6534284a, 0xa92a02ea, null, "EXEMPLAR (Street)");
+			EXEMPLAR_ONEWAYROAD = new DBPFTGI(0x6534284a, 0xcbe084cb, null, "EXEMPLAR (One-Way Road)");
+			EXEMPLAR_AVENUE = new DBPFTGI(0x6534284a, 0xcb730fac, null, "EXEMPLAR (Avenue)");
+			EXEMPLAR_HIGHWAY = new DBPFTGI(0x6534284a, 0xa8434037, null, "EXEMPLAR (Highway)");
+			EXEMPLAR_GROUNDHIGHWAY = new DBPFTGI(0x6534284a, 0xebe084d1, null, "EXEMPLAR (Ground Highway)");
+			EXEMPLAR_DIRTROAD = new DBPFTGI(0x6534284a, 0x6be08658, null, "EXEMPLAR (Dirtroad)");
+			EXEMPLAR_RAIL = new DBPFTGI(0x6534284a, 0xe8347989, null, "EXEMPLAR (Rail)");
+			EXEMPLAR_LIGHTRAIL = new DBPFTGI(0x6534284a, 0x2b79dffb, null, "EXEMPLAR (Lightrail)");
+			EXEMPLAR_MONORAIL = new DBPFTGI(0x6534284a, 0xebe084c2, null, "EXEMPLAR (Monorail)");
+			EXEMPLAR_POWERPOLE = new DBPFTGI(0x6534284a, 0x088e1962, null, "EXEMPLAR (Power Pole)");
+			EXEMPLAR_T21 = new DBPFTGI(0x6534284a, 0x89ac5643, null, "EXEMPLAR (T21)");
+			EXEMPLAR = new DBPFTGI(0x6534284a, null, null, "EXEMPLAR");
+
+			FSH_MISC = new DBPFTGI(0x7ab50e44, 0x1abe787d, null, "FSH (Misc)");
+			FSH_TRANSIT = new DBPFTGI(0x7ab50e44, 0x1abe787d, null, "FSH (Misc)");
+			FSH_BASE_OVERLAY = new DBPFTGI(0x7ab50e44, 0x0986135e, null, "FSH (Base/Overlay Texture)");
+			FSH_SHADOW = new DBPFTGI(0x7ab50e44, 0x2bC2759a, null, "FSH (Shadow DBPFTGI)");
+			FSH_ANIM_PROPS = new DBPFTGI(0x7ab50e44, 0x2a2458f9, null, "FSH (Animation Sprites (Props)");
+			FSH_ANIM_NONPROPS = new DBPFTGI(0x7ab50e44, 0x49a593e7, null, "FSH (Animation Sprites (Non Props)");
+			FSH_TERRAIN_FOUNDATION = new DBPFTGI(0x7ab50e44, 0x891b0e1a, null, "FSH (Terrain/Foundation)");
+			FSH_UI = new DBPFTGI(0x7ab50e44, 0x46a006b0, null, "FSH (UI Image)");
+			FSH = new DBPFTGI(0x7ab50e44, null, null, "FSH");
+
+			SC4PATH_2D = new DBPFTGI(0x296678f7, 0x69668828, null, "SC4PATH (2D)");
+			SC4PATH_3D = new DBPFTGI(0x296678f7, 0xa966883f, null, "SC4PATH (3D)");
+			SC4PATH = new DBPFTGI(0x296678f7, null, null, "SC4PATH");
+
+			PNG_ICON = new DBPFTGI(0x856ddbac, 0x6a386d26, null, "PNG (Icon)");
+			PNG = new DBPFTGI(0x856ddbac, null, null, "PNG");
+			LUA = new DBPFTGI(0xca63e2a3, 0x4a5e8ef6, null, "LUA");
+			LUA_GEN = new DBPFTGI(0xca63e2a3, 0x4a5e8f3f, null, "LUA (Generators)");
+			WAV = new DBPFTGI(0x2026960b, 0xaa4d1933, null, "WAV");
+			LTEXT = new DBPFTGI(0x2026960b, null, null, "LTEXT");
 			INI_FONT = new DBPFTGI(0, 0x4a87bfe8, 0x2a87bffc, "INI (Font Table)");
 			INI_NETWORK = new DBPFTGI(0, 0x8a5971c5, 0x8a5993b9, "INI (Networks)");
-			INI = new DBPFTGI(0, 0x8a5971c5, 0, "INI");
-			RUL = new DBPFTGI(0x0a5bcf4b, 0xaa5bcf57, 0, "RUL");
-			EFFDIR = new DBPFTGI(0xea5118b0, 0, 0, "EFFDIR");
-			NULLTGI = new DBPFTGI(0, 0, 0, "UNKNOWN");
-			
+			INI = new DBPFTGI(0, 0x8a5971c5, null, "INI");
+			RUL = new DBPFTGI(0x0a5bcf4b, 0xaa5bcf57, null, "RUL");
+			EFFDIR = new DBPFTGI(0xea5118b0, null, null, "EFFDIR");
+			NULLTGI = new DBPFTGI(null, null, null, "UNKNOWN");
+
 			knownEntries.Add(BLANKTGI, "BLANKTGI");
 			knownEntries.Add(DIRECTORY, "DIRECTORY");
 			knownEntries.Add(LD, "LD");
@@ -256,7 +277,7 @@ namespace SC4DP2022_wpf {
 			knownEntries.Add(INI, "INI");
 			knownEntries.Add(RUL, "RUL");
 			knownEntries.Add(EFFDIR, "EFFDIR");
-			knownEntries.Add(NULLTGI, "NULLTGI"); // any TGI matches this last one
+			knownEntries.Add(NULLTGI, "NULLTGI"); // NULLTGI matches with everything
 		}
 
 	}
