@@ -92,22 +92,6 @@ namespace SC4DP2022_wpf {
 		}
 
 
-
-
-		//public string GetLabel() {
-		//	return null;
-		//}
-
-		//public bool IsTypeNull() {
-		//	return this.type == null;
-		//}
-		//public bool IsGroupNull() {
-		//	return this.group == null;
-		//}
-		//public bool IsInstanceNull() {
-		//	return this.instance == null;
-		//}
-
 		/// <summary>
 		/// Check if this TGI matches a DBPFTGI set of knownType. Unlike equals, this method is not reflexive.
 		/// </summary>
