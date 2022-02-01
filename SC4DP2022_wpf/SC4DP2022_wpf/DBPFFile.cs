@@ -8,7 +8,7 @@ using System.Diagnostics;
 
 namespace SC4DP2022_wpf {
 	public class DBPFFile {
-		public Header header; //TODO - does this need to be sealed? How to modify Header to allow this?
+		public Header header;
 		public FileInfo file; //probably best to use the FileInfo object to better deal with IO errors
 		public OrderedDictionary entryMap; //TODO - make these unmodifiable outside of this scope. see (Java) Collections.unmodifiableSet
 		public Dictionary<uint, DBPFTGI> tgiMap; //TODO - make these unmodifiable outside of this scope. see (Java) Collections.unmodifiableSet
@@ -107,7 +107,7 @@ namespace SC4DP2022_wpf {
 			}
 		}
 
-		public override string ToString() { //TODO : Implement this?
+		public override string ToString() { //TODO - implement DBPFFile.ToString
 			return base.ToString();
 		}
 

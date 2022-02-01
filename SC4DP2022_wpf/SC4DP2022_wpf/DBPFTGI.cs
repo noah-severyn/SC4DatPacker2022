@@ -6,7 +6,10 @@ using System.Text;
 //See: https://github.com/memo33/jDBPFX/blob/master/src/jdbpfx/DBPFTGI.java
 namespace SC4DP2022_wpf {
 	public class DBPFTGI {
-		private static readonly SortedDictionary<DBPFTGI, string> knownEntries = new SortedDictionary<DBPFTGI, string>();
+		//In general Dictionary items are kept in the order they are added, and since we're not doing a lot of adding/deleting/otherwise sorting, its not as big of a deal and we dont need to use a special type like SortedDictionary
+		//QUESTION - Fix knownEntries to use sorted dict type? https://stackoverflow.com/questions/1453190/does-the-enumerator-of-a-dictionarytkey-tvalue-return-key-value-pairs-in-the
+		//TODO - also make this dictionary immutable
+		private static readonly Dictionary<DBPFTGI, string> knownEntries = new Dictionary<DBPFTGI, string>();
 		public static readonly DBPFTGI BLANKTGI; /** BLANKTGI (0, 0, 0) */
 		public static readonly DBPFTGI DIRECTORY; /** Directory file (0xe86b1eef, 0xe86b1eef, 0x286b1f03) */
 		public static readonly DBPFTGI LD; /** LD file (0x6be74c60, 0x6be74c60, 0) */
@@ -51,7 +54,6 @@ namespace SC4DP2022_wpf {
 		public static readonly DBPFTGI INI_NETWORK; /** Network INI: Remapping, Bridge Exemplars (0, 0x8a5971c5, 0x8a5993b9) */
 		public static readonly DBPFTGI INI; /** INI file (0, 0x8a5971c5, 0) */
 		public static readonly DBPFTGI NULLTGI; /** NULLTGI (0, 0, 0) */
-
 
 
 
@@ -106,28 +108,33 @@ namespace SC4DP2022_wpf {
 		}
 
 		/// <summary>
-		/// 
+		/// Check if this TGI matches a DBPFTGI set of knownType. Unlike equals, this method is not reflexive.
 		/// </summary>
-		/// <param name="tgi"></param>
-		/// <returns></returns>
-		/// 		//"The method {@link DBPFTGI#matches(DBPFTGI)} may be used to determine whether a TGI matches a particular format, that is, a known file type."
-		private bool MatchesKnownEntry(DBPFTGI tgi) {
-			string result;
-			if (knownEntries.TryGetValue(tgi, out result)) {
-				_labelshort = result;
-				return true;
-			}
-			else {
-				_labelshort = "NULLTGI";
-				return false;
-			}
+		/// <remarks>
+		/// If any component of the provided DBPFTGI of knownType is null it will be skipped. This is opposed to Equals which explicitly checks every component.
+		/// Only the provided DBPFTGI of knownType is checked for null components.
+		/// </remarks>
+		/// <param name="tgi">A DBPFTGI to check against</param>
+		/// <returns>TRUE if check passes; FALSE otherwise</returns>
+		public bool MatchesKnownTGI(DBPFTGI knownType) {
+			bool isTIDok, isGIDok, isIIDok, temp;
+
+			//capture specific case if knownType is BLANKTGI or NULLTGI
+
+			temp = this.type == knownType.type;
+			isTIDok = knownType.IsTypeZero() || this.type == knownType.type;
+			temp = this.group == knownType.group;
+			isGIDok = knownType.IsGroupZero() || this.group == knownType.group;
+			temp = this.instance == knownType.instance;
+			isIIDok = knownType.IsInstanceZero() || this.instance == knownType.instance;
+			return isTIDok && isGIDok && isIIDok;
 		}
 
 		/// <summary>
-		/// Tests for equality of DBPFTGI objects by comparing T, G, I of each. This method is reflexive.
+		/// Tests for equality of DBPFTGI objects by comparing T, G, I components of each. This method is reflexive.
 		/// </summary>
 		/// <param name="obj">Any object to compare</param>
-		/// <returns></returns>
+		/// <returns>TRUE if check passes; FALSE otherwise</returns>
 		public override bool Equals(object obj) {
 			if (obj is DBPFTGI) {
 				DBPFTGI checkTGI = (DBPFTGI) obj;
@@ -163,7 +170,7 @@ namespace SC4DP2022_wpf {
 		//This static constructor will be called as soon as the class is loaded into memory, and not necessarily when an object is created.
 		//Known types need to be ordered "bottom-up", that is, specialized entries need to be inserted first, more general ones later.
 		static DBPFTGI() {
-			BLANKTGI = new DBPFTGI(0, 0, 0, "-");
+			BLANKTGI = new DBPFTGI(0, 0, 0, "-"); //QUESTION - it might be an issue that blank components are set to 0?? Possibly redesign but how else to do it using uint? max value?
 			DIRECTORY = new DBPFTGI(0xe86b1eef, 0xe86b1eef, 0x286b1f03, "DIR");
 			LD = new DBPFTGI(0x6be74c60, 0x6be74c60, 0, "LD");
 			S3D_MAXIS = new DBPFTGI(0x5ad0e817, 0xbadb57f1, 0, "S3D");
@@ -185,7 +192,7 @@ namespace SC4DP2022_wpf {
 			FSH_MISC = new DBPFTGI(0x7ab50e44, 0x1abe787d, 0, "FSH (Misc)");
 			FSH_TRANSIT = new DBPFTGI(0x7ab50e44, 0x1abe787d, 0, "FSH (Misc)");
 			FSH_BASE_OVERLAY = new DBPFTGI(0x7ab50e44, 0x0986135e, 0, "FSH (Base/Overlay Texture)");
-			FSH_SHADOW = new DBPFTGI(0x7ab50e44, 0x2bC2759a, 0, "FSH (Shadow DBPFTGI)"),;
+			FSH_SHADOW = new DBPFTGI(0x7ab50e44, 0x2bC2759a, 0, "FSH (Shadow DBPFTGI)");
 			FSH_ANIM_PROPS = new DBPFTGI(0x7ab50e44, 0x2a2458f9, 0, "FSH (Animation Sprites (Props)");
 			FSH_ANIM_NONPROPS = new DBPFTGI(0x7ab50e44, 0x49a593e7, 0, "FSH (Animation Sprites (Non Props)");
 			FSH_TERRAIN_FOUNDATION = new DBPFTGI(0x7ab50e44, 0x891b0e1a, 0, "FSH (Terrain/Foundation)");

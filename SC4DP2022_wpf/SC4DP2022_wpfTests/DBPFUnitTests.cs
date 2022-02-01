@@ -48,7 +48,21 @@ namespace SC4DP2022_wpfTests {
 
 		[TestMethod]
 		public void Test_051_DBPFTGI_Matches() {
-			Assert.IsTrue(false);
+			DBPFTGI tgi_null = new DBPFTGI(0, 0, 0);
+			DBPFTGI tgi_exemplar = new DBPFTGI(0x6534284a, 0, 0);
+			DBPFTGI tgi_exemplarRail = new DBPFTGI(0x6534284a, 0xe8347989, 0);
+			DBPFTGI tgi_exemplarRail2 = new DBPFTGI(0x6534284a, 0xe8347989, 0x1ab4e56a);
+
+			Assert.IsTrue(tgi_null.MatchesKnownTGI(DBPFTGI.NULLTGI));
+			Assert.IsTrue(tgi_exemplar.MatchesKnownTGI(DBPFTGI.EXEMPLAR));
+			Assert.IsTrue(tgi_exemplarRail.MatchesKnownTGI(DBPFTGI.EXEMPLAR_RAIL));
+			Assert.IsTrue(tgi_exemplarRail2.MatchesKnownTGI(DBPFTGI.EXEMPLAR_RAIL));
+			Assert.IsTrue(tgi_exemplarRail2.MatchesKnownTGI(DBPFTGI.EXEMPLAR));
+			Assert.IsFalse(tgi_exemplar.MatchesKnownTGI(DBPFTGI.COHORT));
+			Assert.IsFalse(tgi_exemplar.MatchesKnownTGI(DBPFTGI.NULLTGI));
+
+
+
 		}
 
 
