@@ -82,18 +82,34 @@ namespace SC4DP2022_wpf {
 			get { return _labelshort; }
 		}
 
-		//should never allow creation of null TID GID IID because they interfere with the lookups of knownType
+		//IMPORTANT - Never allow creation of null TID, GID, or IID because they interfere with the lookups of knownType
 		public DBPFTGI(uint type, uint group, uint instance) {
 			_type = type;
 			_group = group;
 			_instance = instance;
-
+			//_label = MatchesAnyKnownTGI();
 			//TODO - call matches here to set label field
 		}
 
+		/// <summary>
+		/// Create a new DBPFTGI based on a known entry type.
+		/// </summary>
+		/// <remarks>
+		/// If any component of the known entry is null the new component is set to 0.
+		/// </remarks>
+		/// <param name="existingType">Known entry type</param>
+		public DBPFTGI(DBPFTGI knownEntry) {
+			_type = knownEntry.type != null ? knownEntry.type : 0;
+			_group = knownEntry.group != null ? knownEntry.group : 0;
+			_instance = knownEntry.instance != null ? knownEntry.instance : 0;
+			//_label = MatchesAnyKnownTGI();
+		}
+
+
+
 
 		/// <summary>
-		/// Check if this TGI matches a DBPFTGI set of knownType. Unlike equals, this method is not reflexive.
+		/// Check if this DBPFTGI matches a known DBPFTGI entry type. Unlike equals, this method is not reflexive.
 		/// </summary>
 		/// <remarks>
 		/// If any component of the provided DBPFTGI of knownType is null it will be skipped. This is opposed to Equals which explicitly checks every component.
@@ -129,6 +145,23 @@ namespace SC4DP2022_wpf {
 			isIIDok = t2;
 
 			return isTIDok && isGIDok && isIIDok;
+		}
+
+
+
+		/// <summary>
+		/// Checks if this DBPFTGI matches any of the known DBPFTGI entry types.
+		/// </summary>
+		/// <returns>The label of the known entry type if found; null otherwise.</returns>
+		//TODO - this should be more ofType instead of Equals - e.g. it should find a match if T and G match, but not necessarily I
+		//TODO - create unit tests for this too
+		public string MatchesAnyKnownTGI() {
+			foreach (KeyValuePair<DBPFTGI,string> entry in knownEntries) {
+				if (this.Equals(entry.Key)) {
+					return entry.Value;
+				}
+			}
+			return null;
 		}
 
 		/// <summary>
