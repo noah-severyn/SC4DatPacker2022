@@ -158,30 +158,37 @@ namespace SC4DP2022_wpf {
 		/// Each component is replaced by the corresponding component of the modifier. If any modifier component is null, the original component is used instead.
 		/// </remarks>
 		/// <param name="modifier">Provided DBPFTGI to modify this DBPFTGI</param>
-		/// <returns>New DBPFTGI object with modified TGI components.</returns>
-		//QUESTION - is it an issue that this cannot be used to simply just change the instance? because external calls cannot pass null parameters to skip changing T and G.
+		/// <returns>A new DBPFTGI object with modified TGI components.</returns>
 		public DBPFTGI ModifyTGI(DBPFTGI modifier) {
-			uint? t, g, i;
-			if (modifier.type != null) {
-				t = modifier.type;
-			} else {
-				t = this.type;
-			}
-			if (modifier.group != null) {
-				g = modifier.group;
-			} else {
-				g = this.group;
-			}
-			if (modifier.instance != null) {
-				i = modifier.group;
-			} else {
-				i = this.instance;
-			}
-			return new DBPFTGI((uint) t, (uint) g, (uint) i);
+			//if modifier.type != null then use modifier.type else use this.type
+			return new DBPFTGI(
+				modifier.type != null ? (uint) modifier.type : (uint) this.type,
+				modifier.group != null ? (uint) modifier.group : (uint) this.group,
+				modifier.instance != null ? (uint) modifier.instance : (uint) this.instance
+			);
+		}
+
+		/// <summary>
+		/// Returns a new DBPFTGI with the specified TGI components.
+		/// </summary>
+		/// <remarks>
+		/// If any provided value is null it will be skipped and the existing component is used instead.
+		/// </remarks>
+		/// <param name="t">Specified type value</param>
+		/// <param name="g">Specified group value</param>
+		/// <param name="i">Specified instance value</param>
+		/// <returns>A new DBPFTGI object with specified TGI components.</returns>
+		public DBPFTGI ModifyTGI(uint? t, uint? g, uint? i) {
+			//if t != null then use t else use this.type
+			return new DBPFTGI(
+				t != null ? (uint) t : (uint) this.type,
+				g != null ? (uint) g : (uint) this.group,
+				i != null ? (uint) i : (uint) this.instance
+			);
 		}
 
 
-		
+
 
 		//This static constructor will be called as soon as the class is loaded into memory, and not necessarily when an object is created.
 		//Known types need to be ordered "bottom-up", that is, specialized entries need to be inserted first, more general ones later.
