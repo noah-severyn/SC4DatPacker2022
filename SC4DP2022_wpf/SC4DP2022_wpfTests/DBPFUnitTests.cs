@@ -25,7 +25,12 @@ namespace SC4DP2022_wpfTests {
 		}
 
 		[TestMethod]
-		public void Test_050_DBPFTGI_Equals() {
+		public void Test_050_DBPFTGI_CreateNew() {
+
+		}
+		
+		[TestMethod]
+		public void Test_052_DBPFTGI_Equals() {
 			DBPFTGI tgi1 = new DBPFTGI(0, 0, 0);
 			DBPFTGI tgi2 = new DBPFTGI(0, 0, 0);
 			DBPFTGI tgi3 = new DBPFTGI(0xe86b1eef, 0xe86b1eef, 0x286b1f03);
@@ -47,7 +52,7 @@ namespace SC4DP2022_wpfTests {
 		}
 
 		[TestMethod]
-		public void Test_051_DBPFTGI_Matches() {
+		public void Test_054_DBPFTGI_Matches() {
 			DBPFTGI tgi_blank = new DBPFTGI(0, 0, 0);
 			DBPFTGI tgi_exemplar = new DBPFTGI(0x6534284a, 0, 0);
 			DBPFTGI tgi_exemplarRail = new DBPFTGI(0x6534284a, 0xe8347989, 0);
@@ -66,7 +71,7 @@ namespace SC4DP2022_wpfTests {
 		}
 
 		[TestMethod]
-		public void Test_052_DBPFTGI_ModifyTGIusingDBPFTGI() {
+		public void Test_056a_DBPFTGI_ModifyTGIusingDBPFTGI() {
 			DBPFTGI exemplar = new DBPFTGI(0x6534284a, 0, 0);
 			DBPFTGI exemplar2 = exemplar.ModifyTGI(DBPFTGI.EXEMPLAR_AVENUE);
 			Assert.AreEqual("T:1697917002 0x6534284A, G:3413315500 0xCB730FAC, I:0 0x00000000", exemplar2.ToString());
@@ -76,7 +81,7 @@ namespace SC4DP2022_wpfTests {
 		}
 
 		[TestMethod]
-		public void Test_053_DBPFTGI_ModifyTGIusingUint() {
+		public void Test_056b_DBPFTGI_ModifyTGIusingUint() {
 			DBPFTGI exemplar = new DBPFTGI(0x6534284a, 0, 1000001);
 			Assert.AreEqual("T:1697917002 0x6534284A, G:0 0x00000000, I:100 0x00000064", exemplar.ModifyTGI(null, null, 100).ToString());
 			Assert.AreEqual("T:100 0x00000064, G:100 0x00000064, I:100 0x00000064", exemplar.ModifyTGI(100, 100, 100).ToString());
