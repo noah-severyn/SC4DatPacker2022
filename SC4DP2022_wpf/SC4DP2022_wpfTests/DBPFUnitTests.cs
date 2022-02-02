@@ -63,8 +63,16 @@ namespace SC4DP2022_wpfTests {
 			Assert.IsFalse(tgi_exemplar.MatchesKnownTGI(DBPFTGI.COHORT));
 			Assert.IsTrue(tgi_exemplar.MatchesKnownTGI(DBPFTGI.NULLTGI));
 			Assert.IsFalse(tgi_exemplar.MatchesKnownTGI(DBPFTGI.PNG));
+		}
 
-
+		[TestMethod]
+		public void Test_052_DBPFTGI_ModifyTGI() {
+			DBPFTGI exemplar = new DBPFTGI(0x6534284a, 0, 0);
+			DBPFTGI exemplar2 = exemplar.ModifyTGI(DBPFTGI.EXEMPLAR_AVENUE);
+			Assert.AreEqual("T:1697917002 0x6534284A, G:3413315500 0xCB730FAC, I:0 0x00000000", exemplar2.ToString());
+			Assert.AreEqual(exemplar.ToString(), exemplar.ModifyTGI(DBPFTGI.NULLTGI).ToString());
+			DBPFTGI exemplar4 = new DBPFTGI(0, 2, 3);
+			Assert.AreEqual("T:3395543715 0xCA63E2A3, G:1247710966 0x4A5E8EF6, I:3 0x00000003", exemplar4.ModifyTGI(DBPFTGI.LUA).ToString());
 		}
 
 
@@ -81,12 +89,12 @@ namespace SC4DP2022_wpfTests {
 		}
 
 		[TestMethod]
-		[Ignore]
 		public void Test_102_NotValidDBPF() {
 			//These should fail : not valid DBPF file
 			Exception ex = Assert.ThrowsException<Exception>(() => new DBPFFile("C:\\Users\\Administrator\\Documents\\SimCity 4\\Plugins\\CAS_AutoHistorical_v0.0.2.dll"));
 			Assert.IsTrue(ex.Message.Contains("File is not a DBPF file!"));
 
+			//example: Assert.ThrowsException<System.ArgumentOutOfRangeException>(() => account.Debit(debitAmount));
 		}
 
 

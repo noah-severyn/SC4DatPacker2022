@@ -151,22 +151,37 @@ namespace SC4DP2022_wpf {
 			return $"T:{_type} 0x{DBPFUtil.UIntToHexString(_type, 8)}, G:{_group} 0x{DBPFUtil.UIntToHexString(_group, 8)}, I:{_instance} 0x{DBPFUtil.UIntToHexString(_instance, 8)}";
 		}
 
-
-
-
 		/// <summary>
-		/// This constructor only to be used to declare known TGI types in the static constructor.
+		/// Returns a new DBPFTGI with the fields of this and the provided TGI.
 		/// </summary>
-		/// <param name="type"></param>
-		/// <param name="group"></param>
-		/// <param name="instance"></param>
-		/// <param name="label"></param>
-		private DBPFTGI(uint? type, uint? group, uint? instance, string label) {
-			_type = type;
-			_group = group;
-			_instance = instance;
-			_label = label;
+		/// <remarks>
+		/// Each component is replaced by the corresponding component of the modifier. If any modifier component is null, the original component is used instead.
+		/// </remarks>
+		/// <param name="modifier">Provided DBPFTGI to modify this DBPFTGI</param>
+		/// <returns>New DBPFTGI object with modified TGI components.</returns>
+		//QUESTION - is it an issue that this cannot be used to simply just change the instance? because external calls cannot pass null parameters to skip changing T and G.
+		public DBPFTGI ModifyTGI(DBPFTGI modifier) {
+			uint? t, g, i;
+			if (modifier.type != null) {
+				t = modifier.type;
+			} else {
+				t = this.type;
+			}
+			if (modifier.group != null) {
+				g = modifier.group;
+			} else {
+				g = this.group;
+			}
+			if (modifier.instance != null) {
+				i = modifier.group;
+			} else {
+				i = this.instance;
+			}
+			return new DBPFTGI((uint) t, (uint) g, (uint) i);
 		}
+
+
+		
 
 		//This static constructor will be called as soon as the class is loaded into memory, and not necessarily when an object is created.
 		//Known types need to be ordered "bottom-up", that is, specialized entries need to be inserted first, more general ones later.
@@ -262,6 +277,20 @@ namespace SC4DP2022_wpf {
 			knownEntries.Add(RUL, "RUL");
 			knownEntries.Add(EFFDIR, "EFFDIR");
 			knownEntries.Add(NULLTGI, "NULLTGI"); // NULLTGI matches with everything
+		}
+
+		/// <summary>
+		/// This constructor only to be used to declare known TGI types in the static constructor.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <param name="group"></param>
+		/// <param name="instance"></param>
+		/// <param name="label"></param>
+		private DBPFTGI(uint? type, uint? group, uint? instance, string label) {
+			_type = type;
+			_group = group;
+			_instance = instance;
+			_label = label;
 		}
 
 	}
