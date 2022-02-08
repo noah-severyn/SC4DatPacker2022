@@ -6,7 +6,7 @@ using System.Text;
 //See: https://github.com/memo33/jDBPFX/blob/master/src/jdbpfx/DBPFEntry.java
 namespace SC4DP2022_wpf {
 	/// <summary>
-	/// An absract form on an entry of a DBPFFile, representing an instance of a subfile that may be contained in a DBPF file
+	/// An abstract form on an entry of a <see cref="DBPFFile"/>, representing an instance of a subfile that may be contained in a DBPF file
 	/// </summary>
 	public class DBPFEntry {
 		private DBPFTGI _tgi;
@@ -35,11 +35,11 @@ namespace SC4DP2022_wpf {
 		}
 
 		/// <summary>
-		/// 
+		/// Create a new DBPFEntry object.
 		/// </summary>
-		/// <param name="tgi"></param>
-		/// <param name="offset"></param>
-		/// <param name="size"></param>
+		/// <param name="tgi">TGI object representing the entry.</param>
+		/// <param name="offset">Offset (location) of the entry within the DBPF file</param>
+		/// <param name="size">Size of data for the entry, in ______</param> //TODO - what are these units?
 		/// <param name="index">Entry position in the file. 0-n</param>
 		public DBPFEntry(DBPFTGI tgi, uint offset, uint size, uint index) {
 			_tgi = tgi;

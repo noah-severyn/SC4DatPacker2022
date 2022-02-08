@@ -118,12 +118,22 @@ namespace SC4DP2022_wpf {
 			this.entryMap = new OrderedDictionary();
 			this.tgiMap = new Dictionary<uint, DBPFTGI>();
 
-			this.Read(this.file);
+			bool map = false;
+			if (map) {
+				this.ReadAndMap(this.file);
+			} else {
+				this.Read(this.file);
+			}
+			
+			
 		}
 
 
 
-
+		/// <summary>
+		/// Adds an entry to the entryMap and the TGI of that entry to the tgiMap.
+		/// </summary>
+		/// <param name="entry">Entry to add</param>
 		private void AddEntry(DBPFEntry entry) {
 			if (entry == null) {
 				throw new ArgumentNullException();
@@ -135,12 +145,12 @@ namespace SC4DP2022_wpf {
 
 
 		/// <summary>
-		/// Reads a DBPF File.
+		/// Reads a DBPF file.
 		/// </summary>
 		/// <remarks>
 		/// Use only for short-lived DBPF files for which the content does not change on disk, or does not matter if it does, or if the file is small. Example: only scanning the TGIs of a file.
 		/// </remarks>
-		/// <param name="file">file of the DBPF object to be used</param>
+		/// <param name="file">File of the DBPF object to be used.</param>
 		/// <returns>A new DBPFFile object</returns>
 		private void Read(FileInfo file) {
 			FileStream fs = new FileStream(file.FullName, FileMode.Open); //TODO - https://docs.microsoft.com/en-us/dotnet/standard/io/handling-io-errors
@@ -179,6 +189,20 @@ namespace SC4DP2022_wpf {
 				br.Close();
 				fs.Close();
 			}
+		}
+
+
+		/// <summary>
+		/// Reads a DBPF file and maps the file from disk to memory.
+		/// </summary>
+		/// <remarks>
+		/// Serves a similar purpose to <see cref="Read(FileInfo)"/>, but it is capable of writing large amount of entries quicker - suitable for large files and files of which the ______ methods will be called frequently.
+		/// </remarks>
+		/// <see cref="Read(FileInfo)"/>
+		/// <param name="file">File of the DBPF object to be used.</param>
+		private DBPFFile ReadAndMap(FileInfo file) {
+			//this.Read(this.file);
+			throw new NotImplementedException();
 		}
 
 
