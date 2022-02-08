@@ -93,7 +93,6 @@ namespace SC4DP2022_wpfTests {
 		public void Test_101_DBPFFile_ValidDBPF() {
 			//DBPFFile dbpf = new DBPFFile("C:\\Users\\Administrator\\Documents\\SimCity 4\\Plugins\\mntoes\\Bournemouth Housing Pack\\Mntoes-Bournemouth Housing Pack.dat");
 			DBPFFile dbpf = new DBPFFile("C:\\Users\\Administrator\\Documents\\SimCity 4\\Plugins\\z_DataView - Parks Aura.dat");
-			//dbpf.reader.Read(dbpf);
 			Assert.AreEqual((uint) 0x44425046, dbpf.header.identifier); //1145196614 dec = 44425046 hex = DBPF ascii
 			Assert.AreEqual((uint) DBPFUtil.ReverseBytes(1), dbpf.header.majorVersion); //16777216 dec = 1000000 hex
 			Assert.AreEqual((uint) 0, dbpf.header.minorVersion);
