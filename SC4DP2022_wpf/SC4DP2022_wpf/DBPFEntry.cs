@@ -6,7 +6,7 @@ using System.Text;
 //See: https://github.com/memo33/jDBPFX/blob/master/src/jdbpfx/DBPFEntry.java
 namespace SC4DP2022_wpf {
 	/// <summary>
-	/// An abstract form on an entry of a <see cref="DBPFFile"/>, representing an instance of a subfile that may be contained in a DBPF file
+	/// An abstract form on an entry of a <see cref="DBPFFile"/>, representing an instance of a subfile that may be contained in a DBPF file.
 	/// </summary>
 	public class DBPFEntry {
 		private DBPFTGI _tgi;
@@ -18,12 +18,24 @@ namespace SC4DP2022_wpf {
 				} else {
 					_tgi = value;
 				}
-				
+
 			}
 		}
-		private uint _index;
 
-		public uint IndexPos {
+		private uint _offset;
+		public uint offset {
+			get { return _offset; }
+			set { _offset = value; }
+		}
+
+		private uint _size;
+		public uint size {
+			get { return _size; }
+			set { _size = value; }
+		}
+
+		private uint _index;
+		public uint indexPos {
 			get { return _index; }
 			set { _index = value; }
 		}
@@ -39,10 +51,12 @@ namespace SC4DP2022_wpf {
 		/// </summary>
 		/// <param name="tgi">TGI object representing the entry.</param>
 		/// <param name="offset">Offset (location) of the entry within the DBPF file</param>
-		/// <param name="size">Size of data for the entry, in ______</param> //TODO - what are these units?
+		/// <param name="size">Size of data for the entry, in bits.</param> //TODO - what are the units of entry size?
 		/// <param name="index">Entry position in the file. 0-n</param>
 		public DBPFEntry(DBPFTGI tgi, uint offset, uint size, uint index) {
 			_tgi = tgi;
+			_offset = offset;
+			_size = size;
 			_index = index;
 		}
 
