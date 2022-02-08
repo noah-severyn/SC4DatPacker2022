@@ -60,6 +60,12 @@ namespace SC4DP2022_wpf {
 			_index = index;
 		}
 
+		public override string ToString() {
+			StringBuilder sb = new StringBuilder(_tgi.ToString());
+			sb.AppendLine($"IndexPosition: {_index}, Offset: {_offset}, Size: {_size}, ");
+			return sb.ToString();
+		}
+
 
 	}
 }
