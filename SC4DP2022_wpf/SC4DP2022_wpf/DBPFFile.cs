@@ -152,6 +152,7 @@ namespace SC4DP2022_wpf {
 		/// </remarks>
 		/// <param name="file">File of the DBPF object to be used.</param>
 		/// <returns>A new DBPFFile object</returns>
+		/// <see cref="https://www.wiki.sc4devotion.com/index.php?title=DBPF#Pseudocode"/>
 		private void Read(FileInfo file) {
 			FileStream fs = new FileStream(file.FullName, FileMode.Open); //TODO - https://docs.microsoft.com/en-us/dotnet/standard/io/handling-io-errors
 			BinaryReader br = new BinaryReader(fs);
@@ -183,6 +184,13 @@ namespace SC4DP2022_wpf {
 					DBPFEntry entry = new DBPFEntry(tgi, offset, size, (uint) idx);
 					this.AddEntry(entry);
 					Trace.WriteLine(tgi.ToString());
+				}
+
+				//Check for a DIR Record
+				foreach (DBPFEntry entry in this.entryMap) {
+					if (entry.TGI.MatchesKnownTGI(DBPFTGI.DIRECTORY)) { //Type: e86b1eef
+
+					}
 				}
 			}
 			finally {
