@@ -138,8 +138,8 @@ namespace SC4DP2022_wpf {
 			if (entry == null) {
 				throw new ArgumentNullException();
 			}
-			entryMap.Add(entry.IndexPos, entry);
-			tgiMap.Add(entry.IndexPos, entry.TGI);
+			entryMap.Add(entry.indexPos, entry);
+			tgiMap.Add(entry.indexPos, entry.TGI);
 		}
 
 
