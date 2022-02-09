@@ -6,6 +6,8 @@ namespace SC4DP2022_wpfTests {
 	[TestClass]
 	public class DBPFUnitTests {
 
+		// Test Methods for DBPFUtil Class
+		#region Test Methods for DBPFUtil Class
 		[TestMethod]
 		public void Test_011_DBPFUtil_ReverseBytes() {
 			//Example: 1697917002 (0x 65 34 28 4A) returns 1244148837 (0x 4A 28 34 65)
@@ -23,7 +25,6 @@ namespace SC4DP2022_wpfTests {
 			Assert.AreEqual("4D2", DBPFUtil.UIntToHexString(1234, 3));
 			Assert.AreEqual("000004D2", DBPFUtil.UIntToHexString(1234, 8));
 		}
-
 
 		[TestMethod]
 		public void Test_013_DBPFUtil_CharsFromByteArray() {
@@ -52,10 +53,13 @@ namespace SC4DP2022_wpfTests {
 
 			Assert.ThrowsException<NullReferenceException>(() => DBPFUtil.CharsFromByteArray(null));
 		}
+		#endregion Test Methods for DBPFUtil Class
 
+		// Test Methods for DBPFTGI Class
+		#region Test Methods for DBPFTGI Class
 		[TestMethod]
 		public void Test_050_DBPFTGI_CreateNew() {
-
+			Assert.IsTrue(false);
 		}
 
 		[TestMethod]
@@ -115,9 +119,10 @@ namespace SC4DP2022_wpfTests {
 			Assert.AreEqual("T:1697917002 0x6534284A, G:0 0x00000000, I:100 0x00000064", exemplar.ModifyTGI(null, null, 100).ToString());
 			Assert.AreEqual("T:100 0x00000064, G:100 0x00000064, I:100 0x00000064", exemplar.ModifyTGI(100, 100, 100).ToString());
 		}
+		#endregion Test Methods for DBPFTGI Class
 
-
-
+		// Test Methods for DBPFFile Class
+		#region Test Methods for DBPFFile Class
 		[TestMethod]
 		public void Test_101_DBPFFile_ValidDBPF() {
 			//DBPFFile dbpf = new DBPFFile("C:\\Users\\Administrator\\Documents\\SimCity 4\\Plugins\\mntoes\\Bournemouth Housing Pack\\Mntoes-Bournemouth Housing Pack.dat");
@@ -148,6 +153,7 @@ namespace SC4DP2022_wpfTests {
 		public void Test_210_ParseIndex() {
 			Assert.IsTrue(false);
 		}
+		#endregion Test Methods for DBPFFile Class
 	}
 
 
