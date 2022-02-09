@@ -6,7 +6,7 @@ namespace SC4DP2022_wpfTests {
 	[TestClass]
 	public class DBPFUnitTests {
 
-		// Test Methods for DBPFUtil Class
+		// 01x Test Methods for DBPFUtil Class
 		#region Test Methods for DBPFUtil Class
 		[TestMethod]
 		public void Test_011_DBPFUtil_ReverseBytes() {
@@ -55,11 +55,17 @@ namespace SC4DP2022_wpfTests {
 		}
 		#endregion Test Methods for DBPFUtil Class
 
-		// Test Methods for DBPFTGI Class
+		// 02x Test methods for DBPFCompression Class
+		#region Test methods for DBPFCompression Class
+		
+
+		#endregion Test methods for DBPFCompression Class
+
+		// 05x Test Methods for DBPFTGI Class
 		#region Test Methods for DBPFTGI Class
 		[TestMethod]
 		public void Test_050_DBPFTGI_CreateNew() {
-			Assert.IsTrue(false);
+			
 		}
 
 		[TestMethod]
@@ -121,7 +127,7 @@ namespace SC4DP2022_wpfTests {
 		}
 		#endregion Test Methods for DBPFTGI Class
 
-		// Test Methods for DBPFFile Class
+		// 1xx Test Methods for DBPFFile Class
 		#region Test Methods for DBPFFile Class
 		[TestMethod]
 		public void Test_101_DBPFFile_ValidDBPF() {

@@ -6,38 +6,55 @@ using System.Text;
 //See: https://github.com/memo33/jDBPFX/blob/master/src/jdbpfx/DBPFEntry.java
 namespace SC4DP2022_wpf {
 	/// <summary>
-	/// An abstract form on an entry of a <see cref="DBPFFile"/>, representing an instance of a subfile that may be contained in a DBPF file.
+	/// An abstract form of an entry item of a <see cref="DBPFFile"/>, representing an instance of a subfile that may be contained in a DBPF file.
 	/// </summary>
 	public class DBPFEntry {
 		private DBPFTGI _tgi;
 		public DBPFTGI TGI {
 			get { return _tgi; }
-			set {
-				if (value == null) {
-					throw new Exception("Null TGI");
-				} else {
-					_tgi = value;
-				}
-
-			}
+			//set {
+			//	if (value == null) {
+			//		throw new Exception("Null TGI");
+			//	} else {
+			//		_tgi = value;
+			//	}
+			//}
 		}
 
 		private uint _offset;
 		public uint offset {
 			get { return _offset; }
-			set { _offset = value; }
+			//set { _offset = value; }
 		}
 
 		private uint _size;
 		public uint size {
 			get { return _size; }
-			set { _size = value; }
+			//set { _size = value; }
 		}
 
 		private uint _index;
 		public uint indexPos {
 			get { return _index; }
-			set { _index = value; }
+			//set { _index = value; }
+		}
+
+		private bool _isCompressed;
+		public bool isCompressed {
+			get { return _isCompressed; }
+			//set { isCompressed = value; }
+		}
+
+		private uint _compressedSize;
+		public uint compressedSize {
+			get { return _compressedSize; }
+			//set { _compressedSize = value; }
+		}
+
+		private uint _decompressedSize;
+		public uint decompressedSize {
+			get { return _decompressedSize; }
+			//set { _decompressedSize = value; }
 		}
 
 
@@ -54,15 +71,20 @@ namespace SC4DP2022_wpf {
 		/// <param name="size">Size of data for the entry, in bits.</param> //TODO - what are the units of entry size?
 		/// <param name="index">Entry position in the file. 0-n</param>
 		public DBPFEntry(DBPFTGI tgi, uint offset, uint size, uint index) {
-			_tgi = tgi;
+			if (tgi == null) {
+				throw new Exception("Null TGI");
+			} else {
+				_tgi = tgi;
+			}
 			_offset = offset;
 			_size = size;
 			_index = index;
+			_isCompressed = false; //TODO implement isCompressed fields for DBPFEntry
 		}
 
 		public override string ToString() {
 			StringBuilder sb = new StringBuilder(_tgi.ToString());
-			sb.AppendLine($"IndexPosition: {_index}, Offset: {_offset}, Size: {_size}, ");
+			sb.AppendLine($" IndexPosition: {_index}, Offset: {_offset}, Size: {_size}, ");
 			return sb.ToString();
 		}
 
