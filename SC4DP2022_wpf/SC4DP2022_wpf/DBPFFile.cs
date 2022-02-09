@@ -167,18 +167,18 @@ namespace SC4DP2022_wpf {
 				this.header.dateModified = DBPFUtil.ReverseBytes(br.ReadUInt32());
 				this.header.indexMajorVersion = DBPFUtil.ReverseBytes(br.ReadUInt32());
 				this.header.indexEntryCount = DBPFUtil.ReverseBytes(br.ReadUInt32());
-				this.header.indexEntryOffset = br.ReadUInt32(); //TODO - figure out why this works as it's different than all of the others ... unless none of the uint   should be reversed???
+				this.header.indexEntryOffset = br.ReadUInt32(); //TODO - figure out why this works as it's different than all of the others ... unless none of the uint should be reversed???
 				this.header.indexSize = DBPFUtil.ReverseBytes(br.ReadUInt32());
 
 				//Read Index Info
 				long len = br.BaseStream.Length;
 				br.BaseStream.Seek((this.header.indexEntryOffset), SeekOrigin.Begin);
 				for (int idx = 0; idx < (this.header.indexEntryCount >> 24); idx++) {
-					uint typeID = DBPFUtil.ReverseBytes(br.ReadUInt32());
-					uint groupID = DBPFUtil.ReverseBytes(br.ReadUInt32());
-					uint instanceID = DBPFUtil.ReverseBytes(br.ReadUInt32());
-					uint offset = DBPFUtil.ReverseBytes(br.ReadUInt32()); //TODO - not reverse bytes here too???
-					uint size = DBPFUtil.ReverseBytes(br.ReadUInt32());
+					uint typeID = br.ReadUInt32();
+					uint groupID = br.ReadUInt32();
+					uint instanceID = br.ReadUInt32();
+					uint offset = br.ReadUInt32();
+					uint size = br.ReadUInt32();
 
 					DBPFTGI tgi = new DBPFTGI(typeID, groupID, instanceID);
 					DBPFEntry entry = new DBPFEntry(tgi, offset, size, (uint) idx);
@@ -186,9 +186,15 @@ namespace SC4DP2022_wpf {
 					Trace.WriteLine(tgi.ToString());
 				}
 
-				//Check for a DIR Record
-				foreach (DBPFEntry entry in this.entryMap) {
+				//Check for a DIR Record (https://www.wiki.sc4devotion.com/index.php?title=DBDF)
+				foreach (DBPFEntry entry in this.entryMap.Values) {
 					if (entry.TGI.MatchesKnownTGI(DBPFTGI.DIRECTORY)) { //Type: e86b1eef
+						br.BaseStream.Seek(entry.offset, SeekOrigin.Begin);
+						int numRecords = (int) entry.size / 16;
+						for (int idx = 0; idx < numRecords; idx++) {
+
+						}
+
 
 					}
 				}
