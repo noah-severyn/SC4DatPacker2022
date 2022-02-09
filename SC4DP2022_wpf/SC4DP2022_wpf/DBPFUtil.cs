@@ -66,5 +66,44 @@ namespace SC4DP2022_wpf {
 			
 		}
 
+
+		/// <summary>
+		/// Reads a byte array and returns a string of the entire array.
+		/// </summary>
+		/// <param name="data">Data to parse</param>
+		/// <returns>A string of parsed data</returns>
+		public static string CharsFromByteArray(byte[] data) {
+			return CharsFromByteArray(data, 0, data.Length);
+		}
+
+		/// <summary>
+		/// Reads a byte array and returns a string from the specified location to the end of the array.
+		/// </summary>
+		/// <param name="data">Data to parse</param>
+		/// <param name="start">Location to start parsing at</param>
+		/// <returns>A string of parsed data</returns>
+		public static string CharsFromByteArray(byte[] data, int start) {
+			return CharsFromByteArray(data, start, data.Length-start);
+		}
+
+		/// <summary>
+		/// Reads a byte array and returns a string from the specified location for a determined length.
+		/// </summary>
+		/// <param name="data">Data to parse</param>
+		/// <param name="start">Location to start parsing at</param>
+		/// <param name="length">Length of the provided data to parse</param>
+		/// <returns>A string of parsed data</returns>
+		public static string CharsFromByteArray(byte[] data, int start, int length) {
+			StringBuilder sb = new StringBuilder();
+			//for (int idx = 0; idx < length; idx++) {
+			//	sb.Append((char) data[start+idx]);
+			//}
+			for (int idx = start; idx < start+length; idx++) {
+				sb.Append((char) data[idx]);
+			}
+
+			return sb.ToString();
+		}
+
 	}
 }
