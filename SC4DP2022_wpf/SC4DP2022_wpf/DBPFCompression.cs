@@ -18,7 +18,7 @@ namespace SC4DP2022_wpf {
 	/// <seealso cref="https://www.wiki.sc4devotion.com/index.php?title=DBPF_Compression"/>
 	public class DBPFCompression {
 
-		private const uint QFS = 0xFB10;
+		private const ushort QFS = 0xFB10;
 		
 
 
@@ -45,7 +45,7 @@ namespace SC4DP2022_wpf {
 		public static bool IsCompressed(byte[] entryData) {
 			if (entryData.Length > 6) {
 
-				uint signature = BitConverter.ToUInt32(entryData, 4);
+				ushort signature = BitConverter.ToUInt16(entryData,4); //ToUint32(entryData,2) would otherwise return 0xFB10 0000, but we're only interested in 0xFB10
 				if (signature == DBPFCompression.QFS) {
 					//Memo's message: "there is an s3d file in SC1.dat which would otherwise return true on uncompressed data; this workaround is not fail proof"
 					//https://github.com/memo33/jDBPFX/blob/fa2535c51de80df48a7f62b79a376e25274998c0/src/jdbpfx/util/DBPFPackager.java#L54
@@ -60,26 +60,40 @@ namespace SC4DP2022_wpf {
 		}
 
 
-
+		/// <summary>
+		/// Returns the length of the data array in bytes.
+		/// </summary>
+		/// <param name="cData">Data to check</param>
+		/// <returns>Size of data</returns>
+		/// <remarks>
+		/// If data is compressed, the uncompressed size is returned. If data is not compressed, the raw size is returned.
+		/// </remarks>
 		//https://github.com/Killeroo/SC4Parser/blob/master/SC4Parser/Compression/QFS.cs#L42
 		public static uint GetDecompressedSize(byte[] cData) {
-			uint compressedSize = BitConverter.ToUInt32(cData, 0);
 
-			//read 5 byte header
-			byte[] header = new byte[5]; 
-			for (int idx = 0; idx < 5; idx++) {
-				header[idx] = cData[idx + 4];
+			if (IsCompressed(cData)) {
+				uint compressedSize = BitConverter.ToUInt32(cData, 0); //first 4 bytes is always the size of header + compressed data
+
+				//read 5 byte header
+				byte[] header = new byte[5];
+				for (int idx = 0; idx < 5; idx++) {
+					header[idx] = cData[idx + 4];
+				}
+
+				//first two bytes of header should be QFS identifier 
+				//TODO - this check is redundant
+				uint signature = (uint) (header[0] | (header[1] << 8));
+				if (signature != DBPFCompression.QFS) {
+					Trace.WriteLine("Not compressed");
+				}
+
+				//next 3 bytes are the decompressed size ... byte shift most significant byte to least
+				uint decompressedSize = Convert.ToUInt32((header[2] << 16) + (header[3] << 8) + header[4]);
+				return decompressedSize;
+
+			} else {
+				return (uint) cData.Length-1;
 			}
-
-			//first two bytes of header should be QFS identifier
-			uint signature = (uint) (header[0] + header[1]);
-			if (signature != DBPFCompression.QFS) {
-				Trace.WriteLine("Not compressed");
-			}
-
-			//next 3 bytes are the decompressed size ... byte shift most significant byte to least
-			uint decompressedSize = Convert.ToUInt32((header[2] << 16) + (header[3] << 8) + header[4]);
-			return decompressedSize;
 		}
 
 
