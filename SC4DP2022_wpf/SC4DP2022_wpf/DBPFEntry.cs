@@ -27,10 +27,16 @@ namespace SC4DP2022_wpf {
 			//set { _offset = value; }
 		}
 
-		private uint _size;
-		public uint size {
-			get { return _size; }
-			//set { _size = value; }
+		private uint _uncompressedSize;
+		public uint uncompressedSize {
+			get { return _uncompressedSize; }
+			set { _uncompressedSize = value; }
+		}
+
+		private uint _compressedSize;
+		public uint compressedSize {
+			get { return _compressedSize; }
+			set { _compressedSize = value; }
 		}
 
 		private uint _index;
@@ -45,17 +51,9 @@ namespace SC4DP2022_wpf {
 			//set { isCompressed = value; }
 		}
 
-		private uint _compressedSize;
-		public uint compressedSize {
-			get { return _compressedSize; }
-			//set { _compressedSize = value; }
-		}
+		
 
-		private uint _decompressedSize;
-		public uint decompressedSize {
-			get { return _decompressedSize; }
-			//set { _decompressedSize = value; }
-		}
+		
 
 
 		// Constructor
@@ -77,14 +75,19 @@ namespace SC4DP2022_wpf {
 				_tgi = tgi;
 			}
 			_offset = offset;
-			_size = size;
+			_uncompressedSize = size;
 			_index = index;
+
+			//We know the offset and size of data, so examine it to determine compression characteristics
+			byte[] data = new byte[size];
+			
+
 			_isCompressed = false; //TODO implement isCompressed fields for DBPFEntry
 		}
 
 		public override string ToString() {
 			StringBuilder sb = new StringBuilder(_tgi.ToString());
-			sb.AppendLine($" IndexPosition: {_index}, Offset: {_offset}, Size: {_size}, ");
+			sb.AppendLine($" IndexPosition: {_index}, Offset: {_offset}, Size: {_compressedSize}, ");
 			return sb.ToString();
 		}
 

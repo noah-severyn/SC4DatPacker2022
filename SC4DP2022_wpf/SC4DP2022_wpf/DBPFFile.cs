@@ -190,7 +190,7 @@ namespace SC4DP2022_wpf {
 				foreach (DBPFEntry entry in this.entryMap.Values) {
 					if (entry.TGI.MatchesKnownTGI(DBPFTGI.DIRECTORY)) { //Type: e86b1eef
 						br.BaseStream.Seek(entry.offset, SeekOrigin.Begin);
-						int numRecords = (int) entry.size / 16;
+						int numRecords = (int) entry.compressedSize / 16;
 						for (int idx = 0; idx < numRecords; idx++) {
 
 						}
