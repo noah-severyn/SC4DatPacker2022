@@ -2,18 +2,24 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 
+
+
+//https://github.com/fbstj/dbpf/blob/c/qfs.c
 namespace SC4DP2022_wpf {
 	/// <summary>
-	/// 
+	/// Implementation of the QFS/RefPack/LZ77 compression and decompression format.
 	/// </summary>
 	/// <remarks>
 	/// Anything prefixed with "c" refers to compressed (e.g. cData = compressedData), and a "d" prefix refers to decompressed (e.g. dData = decompressedData) 
 	/// </remarks>
+	/// <see cref="http://wiki.niotso.org/RefPack"/>
+	/// <seealso cref="https://www.wiki.sc4devotion.com/index.php?title=DBPF_Compression"/>
 	public class DBPFCompression {
 
 		private const uint QFS = 0xFB10;
-
+		
 
 
 
@@ -54,16 +60,26 @@ namespace SC4DP2022_wpf {
 		}
 
 
+
+		//https://github.com/Killeroo/SC4Parser/blob/master/SC4Parser/Compression/QFS.cs#L42
 		public static uint GetDecompressedSize(byte[] cData) {
-			uint? decompressedSize = null;
-			if (cData.Length >= 9) {
-				uint signature = BitConverter.ToUInt32(cData, 4);
-				if (signature == DBPFCompression.QFS) {
-					//decompressedSize = 
-				}
+			uint compressedSize = BitConverter.ToUInt32(cData, 0);
+
+			//read 5 byte header
+			byte[] header = new byte[5]; 
+			for (int idx = 0; idx < 5; idx++) {
+				header[idx] = cData[idx + 4];
 			}
-			//return (uint) decompressedSize;
-			throw new NotImplementedException();
+
+			//first two bytes of header should be QFS identifier
+			uint signature = (uint) (header[0] + header[1]);
+			if (signature != DBPFCompression.QFS) {
+				Trace.WriteLine("Not compressed");
+			}
+
+			//next 3 bytes are the decompressed size ... byte shift most significant byte to least
+			uint decompressedSize = Convert.ToUInt32((header[2] << 16) + (header[3] << 8) + header[4]);
+			return decompressedSize;
 		}
 
 
@@ -72,73 +88,78 @@ namespace SC4DP2022_wpf {
 		/// </summary>
 		/// <param name="data">Compressed</param>
 		/// <returns>Decompressed data</returns>
+		/// <see cref="https://www.wiki.sc4devotion.com/index.php?title=DBPF_Compression"/>
+		/// <see cref="https://github.com/Killeroo/SC4Parser/blob/master/SC4Parser/Compression/QFS.cs"/>
 		public static byte[] Decompress(byte[] cData) {
-			//TODO - check if data is compressed FIRST
-			//cData = compressedData; dData = decompressedData
-			byte[] dData = new byte[GetDecompressedSize(cData)];
+			//Set destination array of decompressed data
+			byte[] dData = new byte[GetDecompressedSize(cData)]; //TODO - check if data is compressed FIRST
 			int dPos = 0;
+
+			//The control character determines which type of decompression algorithm needs to be performed
+			byte ctrlByte1 = 0;
 			int cPos = 0;
-			int ctrlByte1 = 0;
-			while (ctrlByte1 < 0xFC && cPos < cData.Length) {
-				ctrlByte1 = cData[cPos] & 0xFF; //this is byte0 = the first byte of the control character
+
+			//Keep decoding while cPos is within cData and the ctrlByte is not 0xFC
+			while (cPos < cData.Length && ctrlByte1 < 0xFC) {
+				ctrlByte1 = cData[cPos]; //this is byte0 = the first byte of the control character
 				cPos++;
 
 				// Control Characters 0 to 127
 				if (ctrlByte1 >= 0x00 && ctrlByte1 <= 0x7F) {
-					int ctrlByte2 = cData[cPos] & 0xFF; //byte1
+					byte ctrlByte2 = cData[cPos]; //byte1
 					cPos++;
+
 					int numberPlainText = ctrlByte1 & 0x03; //Number of characters immediately after the control character that should be read and appended to output.
-					Array.Copy(cData, cPos, dData, dPos, numberPlainText);
+					LZCompliantCopy(cData, cPos, dData, dPos, numberPlainText);
 
 					dPos += numberPlainText;
 					cPos += numberPlainText;
 					int copyOffset = ((ctrlByte1 & 0x60) << 3) + ctrlByte2 + 1; //Where to start reading characters when copying from somewhere in the already decoded output. This is given as an offset from the current end of the output buffer, i.e.an offset of 0 means that you should copy the last character in the output and append it to the output. And offset of 1 means that you should copy the second - to - last character.
 					int numberToCopyFromOffset = ((ctrlByte1 & 0x1C) >> 2) + 3; //Number of chars that should be copied from somewhere in the already decoded output and added to the end of the output.
-					Array.Copy(dData, copyOffset, dData, dPos, numberToCopyFromOffset);
+					LZCompliantCopy(dData, copyOffset, dData, dPos, numberToCopyFromOffset);
 				}
 
 				// Control Characters 128 to 191
 				else if (ctrlByte1 >= 0x80 && ctrlByte1 <= 0xBF) {
-					int ctrlByte2 = cData[cPos] & 0xFF;
+					byte ctrlByte2 = cData[cPos];
 					cPos++;
-					int ctrlByte3 = cData[cPos] & 0xFF;
+					byte ctrlByte3 = cData[cPos];
 					cPos++;
 
 					int numberOfPlainText = (ctrlByte2 >> 6) & 0x03;
-					Array.Copy(cData, cPos, dData, dPos, numberOfPlainText);
+					LZCompliantCopy(cData, cPos, dData, dPos, numberOfPlainText);
 					dPos += numberOfPlainText;
 					cPos += numberOfPlainText;
 
 					int offset = ((ctrlByte2 & 0x3F) << 8) + (ctrlByte3) + 1;
 					int numberToCopyFromOffset = (ctrlByte1 & 0x3F) + 4;
-					Array.Copy(dData, offset, dData, dPos, numberToCopyFromOffset);
+					LZCompliantCopy(dData, offset, dData, dPos, numberToCopyFromOffset);
 					dPos += numberToCopyFromOffset;
 				}
 
 				// Control Characters 192 to 223
 				else if (ctrlByte1 >= 0xC0 && ctrlByte1 <= 0xDF) {
 					int numberOfPlainText = (ctrlByte1 & 0x03);
-					int ctrlByte2 = cData[cPos] & 0xFF;
+					byte ctrlByte2 = cData[cPos];
 					cPos++;
-					int ctrlByte3 = cData[cPos] & 0xFF;
+					byte ctrlByte3 = cData[cPos];
 					cPos++;
-					int ctrlByte4 = cData[cPos] & 0xFF;
+					byte ctrlByte4 = cData[cPos];
 					cPos++;
-					Array.Copy(cData, cPos, dData, dPos, numberOfPlainText);
+					LZCompliantCopy(cData, cPos, dData, dPos, numberOfPlainText);
 					dPos += numberOfPlainText;
 					cPos += numberOfPlainText;
 
 					int offset = ((ctrlByte1 & 0x10) << 12) + (ctrlByte2 << 8) + (ctrlByte3) + 1;
 					int numberToCopyFromOffset = ((ctrlByte1 & 0x0C) << 6) + (ctrlByte4) + 5;
-					Array.Copy(dData, offset, dPos, numberToCopyFromOffset);
-					dpos += numberToCopyFromOffset;
+					LZCompliantCopy(dData, offset, dData, dPos, numberToCopyFromOffset);
+					dPos += numberToCopyFromOffset;
 				}
 
 				// Control Characters 224 to 251
 				else if (ctrlByte1 >= 0xE0 && ctrlByte1 <= 0xFB) {
-					// 0xE0 - 0xFB
 					int numberOfPlainText = ((ctrlByte1 & 0x1F) << 2) + 4;
-					Array.Copy(cData, cPos, dData, dPos, numberOfPlainText);
+					LZCompliantCopy(cData, cPos, dData, dPos, numberOfPlainText);
 					dPos += numberOfPlainText;
 					cPos += numberOfPlainText;
 				}
@@ -146,33 +167,35 @@ namespace SC4DP2022_wpf {
 				// Control Characters 252 to 255
 				else {
 					int numberOfPlainText = (ctrlByte1 & 0x03);
-					Array.Copy(cData, cPos, dData, dPos, numberOfPlainText);
+					LZCompliantCopy(cData, cPos, dData, dPos, numberOfPlainText);
 					dPos += numberOfPlainText;
 					cPos += numberOfPlainText;
 				}
-
-
 			}
 			return dData;
 		}
 
-		/*Copies data from source to destination array.<br>
-     * The copy is byte by byte from srcPos to destPos and given length.
-     * If the destination array is not large enough a new array will be
-     * created.  Since the new array will be a different object, callers
-     * should always update their reference to the original dest array
-     * with the returned value.
-     */
-		//private byte[] arrayCopyReturnNew(byte[] source, int sourcePos, byte[] destination, int destinationPos, int length) {
 
-		//	//Length handling just in case???
-		//	if (destination.Length < destinationPos + length) {
-		//		byte[] newDestination = new byte[destinationPos + length];
-		//		Array.Copy(destination, newDestination, destination.Length);
-		//		destination = newDestination;
-		//	}
+		/// <summary>
+		/// Recursive method for LZ compliant copying of data between arrays.
+		/// </summary>
+		/// <param name="source">Array to copy from</param>
+		/// <param name="sourceOffset">Location in array to start copying from</param>
+		/// <param name="destination">Array to copy to</param>
+		/// <param name="destinationOffset">Position in array to start copying to</param>
+		/// <param name="length">Length of data to copy</param>
+		/// <remarks>
+		/// With QFS (LZ77), a LZ compatible array copy method is required to copy data one byte at a time between arrays. Within the LZ compatible algorithms, it is legal to copy data to the destination array that would overrun the length of the destination array. The solution is to copy one byte at a time.
+		/// </remarks>
+		private static void LZCompliantCopy(byte[] source, int sourceOffset, byte[] destination, int destinationOffset, int length) {
+			if (length > 0) {
+				Array.Copy(source, sourceOffset, destination, destinationOffset, length);
 
-
-		//}
+				length -= 1;
+				sourceOffset++;
+				destinationOffset++;
+				LZCompliantCopy(source, sourceOffset, destination, destinationOffset, length);
+			}
+		}
 	}
 }
