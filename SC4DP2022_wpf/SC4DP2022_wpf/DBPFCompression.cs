@@ -92,7 +92,7 @@ namespace SC4DP2022_wpf {
 				return decompressedSize;
 
 			} else {
-				return (uint) cData.Length-1;
+				return (uint) cData.Length;
 			}
 		}
 
