@@ -11,13 +11,10 @@ namespace SC4DP2022_wpf {
 	/// <summary>
 	/// Implementation of the QFS/RefPack/LZ77 compression and decompression format.
 	/// </summary>
-	/// <remarks>
-	/// Anything prefixed with "c" refers to compressed (e.g. cData = compressedData), and a "d" prefix refers to decompressed (e.g. dData = decompressedData) 
-	/// </remarks>
 	/// <see cref="http://wiki.niotso.org/RefPack"/>
 	/// <seealso cref="https://www.wiki.sc4devotion.com/index.php?title=DBPF_Compression"/>
 	public class DBPFCompression {
-
+		//Anything prefixed with "c" refers to compressed (e.g. cData = compressedData), and a "d" prefix refers to decompressed (e.g. dData = decompressedData) 
 		private const ushort QFS = 0xFB10;
 		
 
@@ -61,13 +58,10 @@ namespace SC4DP2022_wpf {
 
 
 		/// <summary>
-		/// Returns the length of the data array in bytes.
+		/// Returns the length of the data array in bytes. If data is compressed, the uncompressed size is returned. If data is not compressed, the raw size is returned.
 		/// </summary>
 		/// <param name="cData">Data to check</param>
 		/// <returns>Size of data</returns>
-		/// <remarks>
-		/// If data is compressed, the uncompressed size is returned. If data is not compressed, the raw size is returned.
-		/// </remarks>
 		//https://github.com/Killeroo/SC4Parser/blob/master/SC4Parser/Compression/QFS.cs#L42
 		public static uint GetDecompressedSize(byte[] cData) {
 
