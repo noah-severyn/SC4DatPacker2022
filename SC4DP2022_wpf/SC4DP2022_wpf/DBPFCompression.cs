@@ -100,12 +100,11 @@ namespace SC4DP2022_wpf {
 		/// <see cref="https://www.wiki.sc4devotion.com/index.php?title=DBPF_Compression"/>
 		/// <see cref="https://github.com/Killeroo/SC4Parser/blob/master/SC4Parser/Compression/QFS.cs"/>
 		public static byte[] Decompress(byte[] cData) {
-			//If data is not compressed do not bother running through the algorithm
-			//if (!IsCompressed(cData)) {
-			//	return cData;
-			//} //TODO - uncomment this test later - for test purposes try to decompressed compressed AND decompressed data to verify results
+			//If data is not compressed do not run it through the algorithm otherwise it will return junk data
+			if (!IsCompressed(cData)) {
+				return cData;
+			}
 
-			
 			byte[] dData = new byte[GetDecompressedSize(cData)]; //Set destination array of decompressed data
 			int dPos = 0;
 
@@ -119,7 +118,7 @@ namespace SC4DP2022_wpf {
 
 				// Control Characters 0 to 127
 				if (ctrlByte1 >= 0x00 && ctrlByte1 <= 0x7F) {
-					byte ctrlByte2 = cData[cPos]; //byte1
+					byte ctrlByte2 = cData[cPos]; //byte1 (sets the 2nd byte of the two byte control character)
 					cPos++;
 
 					//Copy from the source array to the destination array
@@ -128,10 +127,11 @@ namespace SC4DP2022_wpf {
 
 					//Copy characters already in the destination array to the current position in the destination array
 					dPos += numberPlainText;
-					cPos += numberPlainText;
-					int copyOffset = ((ctrlByte1 & 0x60) << 3) + ctrlByte2 + 1; //Where to start reading characters when copying from somewhere in the already decoded output. This is given as an offset from the current end of the output buffer, i.e.an offset of 0 means that you should copy the last character in the output and append it to the output. And offset of 1 means that you should copy the second - to - last character.
-					int numberToCopyFromOffset = ((ctrlByte1 & 0x1C) >> 2) + 3; //Number of chars that should be copied from somewhere in the already decoded output and added to the end of the output.
-					LZCompliantCopy(ref dData, copyOffset, ref dData, dPos, numberToCopyFromOffset);
+					//cPos += numberPlainText;
+					int offset = ((ctrlByte1 & 0x60) << 3) + ctrlByte2 + 1; //Where to start reading characters when copying from somewhere in the already decoded output. This is given as an offset from the current end of the output buffer, i.e.an offset of 0 means that you should copy the last character in the output and append it to the output. And offset of 1 means that you should copy the second - to - last character.
+					int length = ((ctrlByte1 & 0x1C) >> 2) + 3; //Number of chars that should be copied from somewhere in the already decoded output and added to the end of the output.
+					LZCompliantCopy(ref dData, dPos - offset, ref dData, dPos, length);
+					dPos += length;
 				}
 
 				// Control Characters 128 to 191
@@ -145,18 +145,17 @@ namespace SC4DP2022_wpf {
 					int numberOfPlainText = (ctrlByte2 >> 6) & 0x03;
 					LZCompliantCopy(ref cData, cPos, ref dData, dPos, numberOfPlainText);
 					dPos += numberOfPlainText;
-					cPos += numberOfPlainText;
+					//cPos += numberOfPlainText;
 
 					//Copy characters already in the destination array to the current position in the destination array
 					int offset = ((ctrlByte2 & 0x3F) << 8) + (ctrlByte3) + 1;
-					int numberToCopyFromOffset = (ctrlByte1 & 0x3F) + 4;
-					LZCompliantCopy(ref dData, offset, ref dData, dPos, numberToCopyFromOffset);
-					dPos += numberToCopyFromOffset;
+					int length = (ctrlByte1 & 0x3F) + 4;
+					LZCompliantCopy(ref dData, dPos-offset, ref dData, dPos, length);
+					dPos += length;
 				}
 
 				// Control Characters 192 to 223
 				else if (ctrlByte1 >= 0xC0 && ctrlByte1 <= 0xDF) {
-					int numberOfPlainText = (ctrlByte1 & 0x03);
 					byte ctrlByte2 = cData[cPos];
 					cPos++;
 					byte ctrlByte3 = cData[cPos];
@@ -165,15 +164,16 @@ namespace SC4DP2022_wpf {
 					cPos++;
 
 					//Copy from the source array to the destination array
+					int numberOfPlainText = (ctrlByte1 & 0x03);
 					LZCompliantCopy(ref cData, cPos, ref dData, dPos, numberOfPlainText);
 					dPos += numberOfPlainText;
-					cPos += numberOfPlainText;
+					//cPos += numberOfPlainText;
 
 					//Copy characters already in the destination array to the current position in the destination array
 					int offset = ((ctrlByte1 & 0x10) << 12) + (ctrlByte2 << 8) + (ctrlByte3) + 1;
-					int numberToCopyFromOffset = ((ctrlByte1 & 0x0C) << 6) + (ctrlByte4) + 5;
-					LZCompliantCopy(ref dData, offset, ref dData, dPos, numberToCopyFromOffset);
-					dPos += numberToCopyFromOffset;
+					int length = ((ctrlByte1 & 0x0C) << 6) + (ctrlByte4) + 5;
+					LZCompliantCopy(ref dData, dPos - offset, ref dData, dPos, length);
+					dPos += length;
 				}
 
 				// Control Characters 224 to 251
@@ -181,7 +181,7 @@ namespace SC4DP2022_wpf {
 					int numberOfPlainText = ((ctrlByte1 & 0x1F) << 2) + 4;
 					LZCompliantCopy(ref cData, cPos, ref dData, dPos, numberOfPlainText);
 					dPos += numberOfPlainText;
-					cPos += numberOfPlainText;
+					cPos += numberOfPlainText+1;
 				}
 
 				// Control Characters 252 to 255
@@ -214,7 +214,7 @@ namespace SC4DP2022_wpf {
 				length -= 1;
 				sourceOffset++;
 				destinationOffset++;
-				LZCompliantCopy(source, sourceOffset, destination, destinationOffset, length);
+				LZCompliantCopy(ref source, sourceOffset, ref destination, destinationOffset, length);
 			}
 		}
 	}
