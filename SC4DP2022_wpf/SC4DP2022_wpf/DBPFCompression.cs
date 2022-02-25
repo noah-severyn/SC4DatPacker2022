@@ -62,6 +62,7 @@ namespace SC4DP2022_wpf {
 		/// </summary>
 		/// <param name="cData">Data to check</param>
 		/// <returns>Size of data</returns>
+
 		//https://github.com/Killeroo/SC4Parser/blob/master/SC4Parser/Compression/QFS.cs#L42
 		public static uint GetDecompressedSize(byte[] cData) {
 
@@ -99,13 +100,17 @@ namespace SC4DP2022_wpf {
 		/// <see cref="https://www.wiki.sc4devotion.com/index.php?title=DBPF_Compression"/>
 		/// <see cref="https://github.com/Killeroo/SC4Parser/blob/master/SC4Parser/Compression/QFS.cs"/>
 		public static byte[] Decompress(byte[] cData) {
-			//Set destination array of decompressed data
-			byte[] dData = new byte[GetDecompressedSize(cData)]; //TODO - check if data is compressed FIRST
+			//If data is not compressed do not bother running through the algorithm
+			//if (!IsCompressed(cData)) {
+			//	return cData;
+			//} //TODO - uncomment this test later - for test purposes try to decompressed compressed AND decompressed data to verify results
+
+			
+			byte[] dData = new byte[GetDecompressedSize(cData)]; //Set destination array of decompressed data
 			int dPos = 0;
 
-			//The control character determines which type of decompression algorithm needs to be performed
-			byte ctrlByte1 = 0;
-			int cPos = 0;
+			byte ctrlByte1 = 0; //The control character determines which type of decompression algorithm needs to be performed
+			int cPos = 9; //bytes 0-1 are header identifier, 2-4 are uncompressed size, 5-8 are unused by SC4
 
 			//Keep decoding while cPos is within cData and the ctrlByte is not 0xFC
 			while (cPos < cData.Length && ctrlByte1 < 0xFC) {
@@ -117,14 +122,16 @@ namespace SC4DP2022_wpf {
 					byte ctrlByte2 = cData[cPos]; //byte1
 					cPos++;
 
+					//Copy from the source array to the destination array
 					int numberPlainText = ctrlByte1 & 0x03; //Number of characters immediately after the control character that should be read and appended to output.
-					LZCompliantCopy(cData, cPos, dData, dPos, numberPlainText);
+					LZCompliantCopy(ref cData, cPos, ref dData, dPos, numberPlainText);
 
+					//Copy characters already in the destination array to the current position in the destination array
 					dPos += numberPlainText;
 					cPos += numberPlainText;
 					int copyOffset = ((ctrlByte1 & 0x60) << 3) + ctrlByte2 + 1; //Where to start reading characters when copying from somewhere in the already decoded output. This is given as an offset from the current end of the output buffer, i.e.an offset of 0 means that you should copy the last character in the output and append it to the output. And offset of 1 means that you should copy the second - to - last character.
 					int numberToCopyFromOffset = ((ctrlByte1 & 0x1C) >> 2) + 3; //Number of chars that should be copied from somewhere in the already decoded output and added to the end of the output.
-					LZCompliantCopy(dData, copyOffset, dData, dPos, numberToCopyFromOffset);
+					LZCompliantCopy(ref dData, copyOffset, ref dData, dPos, numberToCopyFromOffset);
 				}
 
 				// Control Characters 128 to 191
@@ -134,14 +141,16 @@ namespace SC4DP2022_wpf {
 					byte ctrlByte3 = cData[cPos];
 					cPos++;
 
+					//Copy from the source array to the destination array
 					int numberOfPlainText = (ctrlByte2 >> 6) & 0x03;
-					LZCompliantCopy(cData, cPos, dData, dPos, numberOfPlainText);
+					LZCompliantCopy(ref cData, cPos, ref dData, dPos, numberOfPlainText);
 					dPos += numberOfPlainText;
 					cPos += numberOfPlainText;
 
+					//Copy characters already in the destination array to the current position in the destination array
 					int offset = ((ctrlByte2 & 0x3F) << 8) + (ctrlByte3) + 1;
 					int numberToCopyFromOffset = (ctrlByte1 & 0x3F) + 4;
-					LZCompliantCopy(dData, offset, dData, dPos, numberToCopyFromOffset);
+					LZCompliantCopy(ref dData, offset, ref dData, dPos, numberToCopyFromOffset);
 					dPos += numberToCopyFromOffset;
 				}
 
@@ -154,20 +163,23 @@ namespace SC4DP2022_wpf {
 					cPos++;
 					byte ctrlByte4 = cData[cPos];
 					cPos++;
-					LZCompliantCopy(cData, cPos, dData, dPos, numberOfPlainText);
+
+					//Copy from the source array to the destination array
+					LZCompliantCopy(ref cData, cPos, ref dData, dPos, numberOfPlainText);
 					dPos += numberOfPlainText;
 					cPos += numberOfPlainText;
 
+					//Copy characters already in the destination array to the current position in the destination array
 					int offset = ((ctrlByte1 & 0x10) << 12) + (ctrlByte2 << 8) + (ctrlByte3) + 1;
 					int numberToCopyFromOffset = ((ctrlByte1 & 0x0C) << 6) + (ctrlByte4) + 5;
-					LZCompliantCopy(dData, offset, dData, dPos, numberToCopyFromOffset);
+					LZCompliantCopy(ref dData, offset, ref dData, dPos, numberToCopyFromOffset);
 					dPos += numberToCopyFromOffset;
 				}
 
 				// Control Characters 224 to 251
 				else if (ctrlByte1 >= 0xE0 && ctrlByte1 <= 0xFB) {
 					int numberOfPlainText = ((ctrlByte1 & 0x1F) << 2) + 4;
-					LZCompliantCopy(cData, cPos, dData, dPos, numberOfPlainText);
+					LZCompliantCopy(ref cData, cPos, ref dData, dPos, numberOfPlainText);
 					dPos += numberOfPlainText;
 					cPos += numberOfPlainText;
 				}
@@ -175,7 +187,7 @@ namespace SC4DP2022_wpf {
 				// Control Characters 252 to 255
 				else {
 					int numberOfPlainText = (ctrlByte1 & 0x03);
-					LZCompliantCopy(cData, cPos, dData, dPos, numberOfPlainText);
+					LZCompliantCopy(ref cData, cPos, ref dData, dPos, numberOfPlainText);
 					dPos += numberOfPlainText;
 					cPos += numberOfPlainText;
 				}
@@ -195,7 +207,7 @@ namespace SC4DP2022_wpf {
 		/// <remarks>
 		/// With QFS (LZ77), a LZ compatible array copy method is required to copy data one byte at a time between arrays. Within the LZ compatible algorithms, it is legal to copy data to the destination array that would overrun the length of the destination array. The solution is to copy one byte at a time.
 		/// </remarks>
-		private static void LZCompliantCopy(byte[] source, int sourceOffset, byte[] destination, int destinationOffset, int length) {
+		private static void LZCompliantCopy(ref byte[] source, int sourceOffset, ref byte[] destination, int destinationOffset, int length) {
 			if (length > 0) {
 				Array.Copy(source, sourceOffset, destination, destinationOffset, length);
 
