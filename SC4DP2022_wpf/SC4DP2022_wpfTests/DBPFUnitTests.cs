@@ -174,14 +174,16 @@ namespace SC4DP2022_wpfTests {
 
 
 		[TestMethod]
+		[Ignore]
 		public void Test_110_ParseHeader() {
-			Assert.IsTrue(true);
+
 		}
 
 
 		[TestMethod]
+		[Ignore]
 		public void Test_210_ParseIndex() {
-			Assert.IsTrue(true);
+			
 		}
 		#endregion Test Methods for DBPFFile Class
 	}
