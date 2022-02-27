@@ -116,7 +116,7 @@ namespace SC4DP2022_wpf {
 				ctrlByte1 = cData[cPos]; //this is byte0 = the first byte of the control character
 				cPos++;
 
-				// Control Characters 0 to 127
+				// Control Characters 0 to 127 (2 byte length CC)
 				if (ctrlByte1 >= 0x00 && ctrlByte1 <= 0x7F) {
 					byte ctrlByte2 = cData[cPos]; //byte1 (sets the 2nd byte of the two byte control character)
 					cPos++;
@@ -126,15 +126,15 @@ namespace SC4DP2022_wpf {
 					LZCompliantCopy(ref cData, cPos, ref dData, dPos, numberPlainText);
 
 					//Copy characters already in the destination array to the current position in the destination array
+					cPos += numberPlainText;
 					dPos += numberPlainText;
-					//cPos += numberPlainText;
 					int offset = ((ctrlByte1 & 0x60) << 3) + ctrlByte2 + 1; //Where to start reading characters when copying from somewhere in the already decoded output. This is given as an offset from the current end of the output buffer, i.e.an offset of 0 means that you should copy the last character in the output and append it to the output. And offset of 1 means that you should copy the second - to - last character.
 					int length = ((ctrlByte1 & 0x1C) >> 2) + 3; //Number of chars that should be copied from somewhere in the already decoded output and added to the end of the output.
 					LZCompliantCopy(ref dData, dPos - offset, ref dData, dPos, length);
 					dPos += length;
 				}
 
-				// Control Characters 128 to 191
+				// Control Characters 128 to 191 (3 byte length CC)
 				else if (ctrlByte1 >= 0x80 && ctrlByte1 <= 0xBF) {
 					byte ctrlByte2 = cData[cPos];
 					cPos++;
@@ -144,9 +144,9 @@ namespace SC4DP2022_wpf {
 					//Copy from the source array to the destination array
 					int numberOfPlainText = (ctrlByte2 >> 6) & 0x03;
 					LZCompliantCopy(ref cData, cPos, ref dData, dPos, numberOfPlainText);
+					cPos += numberOfPlainText; 
 					dPos += numberOfPlainText;
-					//cPos += numberOfPlainText;
-
+					
 					//Copy characters already in the destination array to the current position in the destination array
 					int offset = ((ctrlByte2 & 0x3F) << 8) + (ctrlByte3) + 1;
 					int length = (ctrlByte1 & 0x3F) + 4;
@@ -154,7 +154,7 @@ namespace SC4DP2022_wpf {
 					dPos += length;
 				}
 
-				// Control Characters 192 to 223
+				// Control Characters 192 to 223 (4 byte length CC)
 				else if (ctrlByte1 >= 0xC0 && ctrlByte1 <= 0xDF) {
 					byte ctrlByte2 = cData[cPos];
 					cPos++;
@@ -166,8 +166,8 @@ namespace SC4DP2022_wpf {
 					//Copy from the source array to the destination array
 					int numberOfPlainText = (ctrlByte1 & 0x03);
 					LZCompliantCopy(ref cData, cPos, ref dData, dPos, numberOfPlainText);
+					cPos += numberOfPlainText;
 					dPos += numberOfPlainText;
-					//cPos += numberOfPlainText;
 
 					//Copy characters already in the destination array to the current position in the destination array
 					int offset = ((ctrlByte1 & 0x10) << 12) + (ctrlByte2 << 8) + (ctrlByte3) + 1;
@@ -176,20 +176,20 @@ namespace SC4DP2022_wpf {
 					dPos += length;
 				}
 
-				// Control Characters 224 to 251
+				// Control Characters 224 to 251 (1 byte length CC)
 				else if (ctrlByte1 >= 0xE0 && ctrlByte1 <= 0xFB) {
 					int numberOfPlainText = ((ctrlByte1 & 0x1F) << 2) + 4;
 					LZCompliantCopy(ref cData, cPos, ref dData, dPos, numberOfPlainText);
+					cPos += numberOfPlainText;
 					dPos += numberOfPlainText;
-					cPos += numberOfPlainText+1;
 				}
 
-				// Control Characters 252 to 255
+				// Control Characters 252 to 255 (1 byte length CC)
 				else {
 					int numberOfPlainText = (ctrlByte1 & 0x03);
 					LZCompliantCopy(ref cData, cPos, ref dData, dPos, numberOfPlainText);
-					dPos += numberOfPlainText;
 					cPos += numberOfPlainText;
+					dPos += numberOfPlainText;
 				}
 			}
 			return dData;
@@ -215,6 +215,9 @@ namespace SC4DP2022_wpf {
 				sourceOffset++;
 				destinationOffset++;
 				LZCompliantCopy(ref source, sourceOffset, ref destination, destinationOffset, length);
+				//for (int idx = 0; idx < length; idx++) {
+				//	destination[destinationOffset + idx] = source[sourceOffset + idx];
+				//}
 			}
 		}
 	}
