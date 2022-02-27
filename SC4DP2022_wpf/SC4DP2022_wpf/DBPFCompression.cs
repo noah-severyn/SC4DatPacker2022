@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 
 
-//https://github.com/fbstj/dbpf/blob/c/qfs.c
+//
 namespace SC4DP2022_wpf {
 	/// <summary>
 	/// Implementation of the QFS/RefPack/LZ77 compression and decompression format.
@@ -16,23 +16,7 @@ namespace SC4DP2022_wpf {
 	public class DBPFCompression {
 		//Anything prefixed with "c" refers to compressed (e.g. cData = compressedData), and a "d" prefix refers to decompressed (e.g. dData = decompressedData) 
 		private const ushort QFS = 0xFB10;
-		
 
-
-
-		//https://www.wiki.sc4devotion.com/index.php?title=DBPF_Compression
-		/*first 4 bytes : size of following header + compressed data
-		 * 5th byte		: offset 0 = compression id = 0x10FB --- offset 2 = uncompressed file size
-		 *				  offset 5 start of compressed file data
-		 * 
-		 * Reading compressed data:
-		 *		- read the control character
-		 *		- depending on control character, read 0-3 more bytes that may be part of the control character
-		 *		- inspect control character to determine *how many* characters should be read and *from where*
-		 *			- read 0-n characters from the source and append them to the output (n = *how many* from above)
-		 *			- or, copy 0-n characters from somwehere in the output to the end of the output (n = *from where* from above)
-		 * 
-		 */
 
 		/// <summary>
 		/// Check if the data is compressed.
@@ -62,8 +46,6 @@ namespace SC4DP2022_wpf {
 		/// </summary>
 		/// <param name="cData">Data to check</param>
 		/// <returns>Size of data</returns>
-
-		//https://github.com/Killeroo/SC4Parser/blob/master/SC4Parser/Compression/QFS.cs#L42
 		public static uint GetDecompressedSize(byte[] cData) {
 
 			if (IsCompressed(cData)) {
@@ -108,27 +90,26 @@ namespace SC4DP2022_wpf {
 			byte[] dData = new byte[GetDecompressedSize(cData)]; //Set destination array of decompressed data
 			int dPos = 0;
 
-			byte ctrlByte1 = 0; //The control character determines which type of decompression algorithm needs to be performed
+			byte ctrlByte1 = 0; //The control character (CC) determines which type of decompression algorithm needs to be performed; overall CC can be 1 to 4 bytes, depending on byte1 of CC
 			int cPos = 9; //bytes 0-1 are header identifier, 2-4 are uncompressed size, 5-8 are unused by SC4
 
-			//Keep decoding while cPos is within cData and the ctrlByte is not 0xFC
 			while (cPos < cData.Length && ctrlByte1 < 0xFC) {
-				ctrlByte1 = cData[cPos]; //this is byte0 = the first byte of the control character
+				ctrlByte1 = cData[cPos]; //this is byte0 = the first byte of the CC
 				cPos++;
 
 				// Control Characters 0 to 127 (2 byte length CC)
 				if (ctrlByte1 >= 0x00 && ctrlByte1 <= 0x7F) {
-					byte ctrlByte2 = cData[cPos]; //byte1 (sets the 2nd byte of the two byte control character)
+					byte ctrlByte2 = cData[cPos];
 					cPos++;
 
 					//Copy from the source array to the destination array
-					int numberPlainText = ctrlByte1 & 0x03; //Number of characters immediately after the control character that should be read and appended to output.
+					int numberPlainText = ctrlByte1 & 0x03;
 					LZCompliantCopy(ref cData, cPos, ref dData, dPos, numberPlainText);
 
 					//Copy characters already in the destination array to the current position in the destination array
 					cPos += numberPlainText;
 					dPos += numberPlainText;
-					int offset = ((ctrlByte1 & 0x60) << 3) + ctrlByte2 + 1; //Where to start reading characters when copying from somewhere in the already decoded output. This is given as an offset from the current end of the output buffer, i.e.an offset of 0 means that you should copy the last character in the output and append it to the output. And offset of 1 means that you should copy the second - to - last character.
+					int offset = ((ctrlByte1 & 0x60) << 3) + ctrlByte2 + 1;
 					int length = ((ctrlByte1 & 0x1C) >> 2) + 3; //Number of chars that should be copied from somewhere in the already decoded output and added to the end of the output.
 					LZCompliantCopy(ref dData, dPos - offset, ref dData, dPos, length);
 					dPos += length;
@@ -209,15 +190,13 @@ namespace SC4DP2022_wpf {
 		/// </remarks>
 		private static void LZCompliantCopy(ref byte[] source, int sourceOffset, ref byte[] destination, int destinationOffset, int length) {
 			if (length > 0) {
+				//QUESTION - is a simple loop quicker than recursive Array.Copy? I'd think so but is it needed?
 				Array.Copy(source, sourceOffset, destination, destinationOffset, length);
 
 				length -= 1;
 				sourceOffset++;
 				destinationOffset++;
 				LZCompliantCopy(ref source, sourceOffset, ref destination, destinationOffset, length);
-				//for (int idx = 0; idx < length; idx++) {
-				//	destination[destinationOffset + idx] = source[sourceOffset + idx];
-				//}
 			}
 		}
 	}
