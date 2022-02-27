@@ -79,8 +79,8 @@ namespace SC4DP2022_wpfTests {
 
 		[TestMethod]
 		public void Test_025_DBPFCompression_Decompress() {
-			Assert.AreEqual(notcompresseddata, DBPFCompression.Decompress(notcompresseddata));
-			Assert.AreEqual(decompresseddata, DBPFCompression.Decompress(compresseddata));
+			CollectionAssert.AreEquivalent(notcompresseddata, DBPFCompression.Decompress(notcompresseddata));
+			CollectionAssert.AreEquivalent(decompresseddata, DBPFCompression.Decompress(compresseddata));
 		}
 
 		#endregion Test methods for DBPFCompression Class
