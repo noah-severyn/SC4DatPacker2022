@@ -5,8 +5,6 @@ using System.IO;
 using System.Diagnostics;
 
 
-
-//
 namespace SC4DP2022_wpf {
 	/// <summary>
 	/// Implementation of the QFS/RefPack/LZ77 compression and decompression format.
