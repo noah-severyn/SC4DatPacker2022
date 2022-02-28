@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
@@ -45,7 +46,6 @@ namespace SC4DP2022_wpf {
 		/// <param name="cData">Data to check</param>
 		/// <returns>Size of data</returns>
 		public static uint GetDecompressedSize(byte[] cData) {
-
 			if (IsCompressed(cData)) {
 				uint compressedSize = BitConverter.ToUInt32(cData, 0); //first 4 bytes is always the size of header + compressed data
 
@@ -77,7 +77,6 @@ namespace SC4DP2022_wpf {
 		/// </summary>
 		/// <param name="data">Compressed</param>
 		/// <returns>Decompressed data</returns>
-		/// <see cref="https://www.wiki.sc4devotion.com/index.php?title=DBPF_Compression"/>
 		/// <see cref="https://github.com/Killeroo/SC4Parser/blob/master/SC4Parser/Compression/QFS.cs"/>
 		public static byte[] Decompress(byte[] cData) {
 			//If data is not compressed do not run it through the algorithm otherwise it will return junk data
@@ -172,6 +171,55 @@ namespace SC4DP2022_wpf {
 				}
 			}
 			return dData;
+		}
+
+
+		/// <summary>
+		/// Compress the provided data.
+		/// </summary>
+		/// <param name="dData">Uncompressed data</param>
+		/// <returns>Compressed data</returns>
+		/// <see cref="https://github.com/memo33/jDBPFX/blob/master/src/jdbpfx/util/DBPFPackager.java#L170"/>
+		public static byte[] Compress(byte[] dData) {
+			//check if data is big enough to compress
+			if (dData.Length < 6) {
+				return dData;
+			}
+			//check if data is already compressed
+			if (IsCompressed(dData)) {
+				return dData;
+			}
+
+			const int MAXOFFSET = 0x20000;
+			const int MAXCOPYCOUNT = 0x404;
+			const int QFSMAXITER = 0X80; //used to fine tune the lookup: small values increase the compression for big files
+			Dictionary<int, ArrayList> cmpmap = new Dictionary<int, ArrayList>(); //contains the latest offset for a combination of two characters
+			byte[] cData = new byte[dData.Length + MAXCOPYCOUNT]; //max size = uncompressedSize + MAXCOPYCOUNT
+
+			int writeIdx = 9; //leave 9 bytes for the header
+			int lastReadIdx = 0;
+			//ArrayList locsOfCurrentIdx = new ArrayList();
+			ArrayList locsOfCurrentIdx;
+			ArrayList ret;
+			int idx = 0;
+
+			while (idx < dData.Length - 3) {
+				//get all compression candidates (list of offsets for all occurrences of the current 3 bytes
+				do {
+					idx++;
+					//todo - escape loop?
+					int mapindex = dData[idx] | (dData[idx + 1] << 8) | (dData[idx + 2] << 16);
+					cmpmap.TryGetValue(mapindex, out locsOfCurrentIdx);
+					if (locsOfCurrentIdx == null) {
+						locsOfCurrentIdx = new ArrayList();
+						cmpmap.Add(mapindex, locsOfCurrentIdx);
+					}
+					locsOfCurrentIdx.Add(idx);
+				} while (idx < lastReadIdx);
+
+
+			}
+			
 		}
 
 
