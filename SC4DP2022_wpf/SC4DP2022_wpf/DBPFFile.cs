@@ -112,11 +112,6 @@ namespace SC4DP2022_wpf {
 		}
 
 		//------------- BEGIN DBPFFile ------------- \\
-
-		public override string ToString() { //TODO - implement DBPFFile.ToString
-			return base.ToString();
-		}
-
 		/// <summary>
 		/// Read from an existing DBPF file and instantiate a new DBPFFile object.
 		/// </summary>
@@ -138,7 +133,6 @@ namespace SC4DP2022_wpf {
 		}
 
 
-
 		/// <summary>
 		/// Adds an entry to the entryMap and the TGI of that entry to the tgiMap.
 		/// </summary>
@@ -149,6 +143,11 @@ namespace SC4DP2022_wpf {
 			}
 			entryMap.Add(entry.indexPos, entry);
 			tgiMap.Add(entry.indexPos, entry.TGI);
+		}
+
+
+		public override string ToString() { //TODO - implement DBPFFile.ToString
+			return base.ToString();
 		}
 
 
