@@ -7,14 +7,18 @@ using System.IO;
 using System.Diagnostics;
 
 namespace SC4DP2022_wpf {
+	/// <summary>
+	/// Represents the header data and entry list as read from a DBPF file.
+	/// </summary>
 	public class DBPFFile {
 		public Header header;
-		public FileInfo file; //probably best to use the FileInfo object to better deal with IO errors
+		public FileInfo file;
 		public OrderedDictionary entryMap; //TODO - make these unmodifiable outside of this scope. see (Java) Collections.unmodifiableSet
 		public Dictionary<uint, DBPFTGI> tgiMap; //TODO - make these unmodifiable outside of this scope. see (Java) Collections.unmodifiableSet
 
-
-
+		/// <summary>
+		/// Contains DBPFFile header data, including all related fields.
+		/// </summary>
 		public class Header {
 			private uint _identifier;
 			private uint _majorVersion;
@@ -107,11 +111,16 @@ namespace SC4DP2022_wpf {
 			}
 		}
 
+		//------------- BEGIN DBPFFile ------------- \\
+
 		public override string ToString() { //TODO - implement DBPFFile.ToString
 			return base.ToString();
 		}
 
-		//TODO - implement this constructor???
+		/// <summary>
+		/// Read from an existing DBPF file and instantiate a new DBPFFile object.
+		/// </summary>
+		/// <param name="filePath">Full path of file to read, including filename and extension.</param>
 		public DBPFFile(string filePath) {
 			this.file = new FileInfo(filePath);
 			this.header = new Header();

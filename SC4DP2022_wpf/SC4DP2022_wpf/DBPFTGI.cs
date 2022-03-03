@@ -118,31 +118,25 @@ namespace SC4DP2022_wpf {
 		/// <param name="tgi">A DBPFTGI to check against</param>
 		/// <returns>TRUE if check passes; FALSE otherwise</returns>
 		public bool MatchesKnownTGI(DBPFTGI knownType) {
-			bool isTIDok, isGIDok, isIIDok, t2;
+			bool isTIDok, isGIDok, isIIDok;
 
-			if (knownType.type.HasValue) {
-				t2 = this.type == knownType.type;
+			if (!knownType.type.HasValue) {
+				isTIDok = true;
+			} else {
+				isTIDok = this.type == knownType.type;
 			}
-			else {
-				t2 = true;
-			}
-			isTIDok = t2; //TODO - condense this down into boolean logic
 
-			if (knownType.group.HasValue) {
-				t2 = this.group == knownType.group;
+			if (!knownType.group.HasValue) {
+				isGIDok = true;
+			} else {
+				isGIDok = this.group == knownType.group;
 			}
-			else {
-				t2 = true;
-			}
-			isGIDok = t2;
 
-			if (knownType.instance.HasValue) {
-				t2 = this.instance == knownType.instance;
+			if (!knownType.instance.HasValue) {
+				isIIDok = true;
+			} else {
+				isIIDok = this.instance == knownType.instance;
 			}
-			else {
-				t2 = true;
-			}
-			isIIDok = t2;
 
 			return isTIDok && isGIDok && isIIDok;
 		}
@@ -221,10 +215,10 @@ namespace SC4DP2022_wpf {
 		}
 
 
-
-
-		//This static constructor will be called as soon as the class is loaded into memory, and not necessarily when an object is created.
-		//Known types need to be ordered "bottom-up", that is, specialized entries need to be inserted first, more general ones later.
+		/// <summary>
+		/// This static constructor will be called as soon as the class is loaded into memory, and not necessarily when an object is created.
+		/// Known types need to be ordered "bottom-up", that is, specialized entries need to be inserted first, more general ones later.
+		/// </summary>
 		static DBPFTGI() {
 			BLANKTGI = new DBPFTGI(0, 0, 0, "-");
 			DIRECTORY = new DBPFTGI(0xe86b1eef, 0xe86b1eef, 0x286b1f03, "DIR");
@@ -320,7 +314,7 @@ namespace SC4DP2022_wpf {
 		}
 
 		/// <summary>
-		/// This constructor only to be used to declare known TGI types in the static constructor.
+		/// This constructor only to be used internally to this class to declare known TGI types in the static constructor.
 		/// </summary>
 		/// <param name="type"></param>
 		/// <param name="group"></param>
