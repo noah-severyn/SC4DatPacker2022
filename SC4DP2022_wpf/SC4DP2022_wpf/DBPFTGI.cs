@@ -6,8 +6,8 @@ using System.Text;
 //See: https://github.com/memo33/jDBPFX/blob/master/src/jdbpfx/DBPFTGI.java
 namespace SC4DP2022_wpf {
 	public class DBPFTGI {
-		//In general Dictionary items are kept in the order they are added, and since we're not doing a lot of adding/deleting/otherwise sorting, its not as big of a deal and we dont need to use a special type like SortedDictionary
-		//QUESTION - Fix knownEntries to use sorted dict type? https://stackoverflow.com/questions/1453190/does-the-enumerator-of-a-dictionarytkey-tvalue-return-key-value-pairs-in-the
+		//In general Dictionary items are kept in the order they are added, and since we're not doing a lot of adding/deleting/otherwise sorting, its not as big of a deal and we don't need to use a special type like SortedDictionary
+		//QUESTION - Fix knownEntries to use sorted dictionary type? https://stackoverflow.com/questions/1453190/does-the-enumerator-of-a-dictionarytkey-tvalue-return-key-value-pairs-in-the
 		//TODO - also make this dictionary immutable
 		private static readonly Dictionary<DBPFTGI, string> knownEntries = new Dictionary<DBPFTGI, string>();
 		public static readonly DBPFTGI BLANKTGI; /** BLANKTGI (0, 0, 0) */
@@ -106,10 +106,8 @@ namespace SC4DP2022_wpf {
 		}
 
 
-
-
 		/// <summary>
-		/// Check if this DBPFTGI matches a known DBPFTGI entry type. Unlike equals, this method is not reflexive.
+		/// Check if this DBPFTGI matches a specific known DBPFTGI entry type. Unlike equals, this method is not reflexive.
 		/// </summary>
 		/// <remarks>
 		/// If any component of the provided DBPFTGI of knownType is null it will be skipped. This is opposed to Equals which explicitly checks every component.
@@ -142,13 +140,10 @@ namespace SC4DP2022_wpf {
 		}
 
 
-
 		/// <summary>
 		/// Checks if this DBPFTGI matches any of the known DBPFTGI entry types.
 		/// </summary>
 		/// <returns>The label of the known entry type if found; null otherwise.</returns>
-		//TODO - this should be more ofType instead of Equals - e.g. it should find a match if T and G match, but not necessarily I
-		//TODO - create unit tests for this too
 		public string MatchesAnyKnownTGI() {
 			foreach (KeyValuePair<DBPFTGI,string> entry in knownEntries) {
 				if (this.Equals(entry.Key)) {
@@ -158,15 +153,34 @@ namespace SC4DP2022_wpf {
 			return null;
 		}
 
+
 		/// <summary>
 		/// Tests for equality of DBPFTGI objects by comparing T, G, I components of each. This method is reflexive.
 		/// </summary>
+		/// <remarks>If any component of the passed DBPFTGI is null that component is ignored in the evaluation.</remarks>
 		/// <param name="obj">Any object to compare</param>
 		/// <returns>TRUE if check passes; FALSE otherwise</returns>
 		public override bool Equals(object obj) {
+			bool evalT, evalG, evalI;
 			if (obj is DBPFTGI) {
 				DBPFTGI checkTGI = (DBPFTGI) obj;
-				return this.type == checkTGI.type && this.group == checkTGI.group && this.instance == checkTGI.instance;
+				if (!(checkTGI.type is null)) {
+					evalT = this.type == checkTGI.type;
+				} else {
+					evalT = true;
+				}
+				if (!(checkTGI.group is null)) {
+					evalG = this.group == checkTGI.group;
+				} else {
+					evalG = true;
+				}
+				if (!(checkTGI.instance is null)) {
+					evalI = this.instance == checkTGI.instance;
+				} else {
+					evalI = true;
+				}
+				return evalT && evalG && evalI;
+				//return this.type == checkTGI.type && this.group == checkTGI.group && this.instance == checkTGI.instance;
 			}
 			else {
 				return false;

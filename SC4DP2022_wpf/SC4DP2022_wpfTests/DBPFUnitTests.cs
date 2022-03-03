@@ -115,7 +115,7 @@ namespace SC4DP2022_wpfTests {
 		}
 
 		[TestMethod]
-		public void Test_054_DBPFTGI_Matches() {
+		public void Test_054_DBPFTGI_MatchesKnownTGI() {
 			DBPFTGI tgi_blank = new DBPFTGI(0, 0, 0);
 			DBPFTGI tgi_exemplar = new DBPFTGI(0x6534284a, 0, 0);
 			DBPFTGI tgi_exemplarRail = new DBPFTGI(0x6534284a, 0xe8347989, 0);
@@ -131,6 +131,22 @@ namespace SC4DP2022_wpfTests {
 			Assert.IsFalse(tgi_exemplar.MatchesKnownTGI(DBPFTGI.COHORT));
 			Assert.IsTrue(tgi_exemplar.MatchesKnownTGI(DBPFTGI.NULLTGI));
 			Assert.IsFalse(tgi_exemplar.MatchesKnownTGI(DBPFTGI.PNG));
+		}
+
+		[TestMethod]
+		public void Test_055_DBPFTGI_MatchesAnyKnownTGI() {
+			DBPFTGI tgi_blank = new DBPFTGI(0, 0, 0);
+			DBPFTGI tgi_exemplar = new DBPFTGI(0x6534284a, 0, 0);
+			DBPFTGI tgi_exemplarRail = new DBPFTGI(0x6534284a, 0xe8347989, 0);
+			DBPFTGI tgi_exemplarRail2 = new DBPFTGI(0x6534284a, 0xe8347989, 0x1ab4e56a);
+			DBPFTGI tgi_PNG_Icon = new DBPFTGI(0x856ddbac, 0x6a386d26, 0x1ab4e56f);
+			DBPFTGI tgi_PNG = new DBPFTGI(0x856ddbac, 0x6a386d27, 0x1ab4e56f);
+			Assert.AreEqual("BLANKTGI", tgi_blank.MatchesAnyKnownTGI());
+			Assert.AreEqual("EXEMPLAR", tgi_exemplar.MatchesAnyKnownTGI());
+			Assert.AreEqual("EXEMPLAR_RAIL", tgi_exemplarRail.MatchesAnyKnownTGI());
+			Assert.AreEqual("EXEMPLAR_RAIL", tgi_exemplarRail2.MatchesAnyKnownTGI());
+			Assert.AreEqual("PNG_ICON", tgi_PNG_Icon.MatchesAnyKnownTGI());
+			Assert.AreEqual("PNG", tgi_PNG.MatchesAnyKnownTGI());
 		}
 
 		[TestMethod]
