@@ -202,12 +202,16 @@ namespace SC4DP2022_wpf {
 			ArrayList locsOfCurrentIdx;
 			ArrayList ret;
 			int idx = 0;
+			bool end = false;
 
 			while (idx < dData.Length - 3) {
 				//get all compression candidates (list of offsets for all occurrences of the current 3 bytes
 				do {
 					idx++;
-					//todo - escape loop?
+					if (idx >= dData.Length - 2) {
+						end = true;
+						break;
+					}
 					int mapindex = dData[idx] | (dData[idx + 1] << 8) | (dData[idx + 2] << 16);
 					cmpmap.TryGetValue(mapindex, out locsOfCurrentIdx);
 					if (locsOfCurrentIdx == null) {
@@ -216,10 +220,20 @@ namespace SC4DP2022_wpf {
 					}
 					locsOfCurrentIdx.Add(idx);
 				} while (idx < lastReadIdx);
+				if (end) {
+					break;
+				}
 
+				//find the longest repeating byte sequence in the index list (for offset copy)
+				int offsetCopyCount = 0;
+				int loopcount = 1;
+				//while (loopcount < locsOfCurrentIdx.Count && loopcount < QFSMAXITER) {
+
+				//}
+				//TODO finish compression implementation https://github.com/memo33/jDBPFX/blob/master/src/jdbpfx/util/DBPFPackager.java#L202
 
 			}
-			
+			throw new NotImplementedException();
 		}
 
 
