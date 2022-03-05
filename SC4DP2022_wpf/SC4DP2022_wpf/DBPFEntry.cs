@@ -8,7 +8,7 @@ namespace SC4DP2022_wpf {
 	/// <summary>
 	/// An abstract form of an entry item of a <see cref="DBPFFile"/>, representing an instance of a subfile that may be contained in a DBPF file.
 	/// </summary>
-	public class DBPFEntry {
+	public abstract class DBPFEntry {
 		private DBPFTGI _tgi;
 		public DBPFTGI TGI {
 			get { return _tgi; }
@@ -70,7 +70,8 @@ namespace SC4DP2022_wpf {
 		/// <param name="index">Entry position in the file. 0-n</param>
 		public DBPFEntry(DBPFTGI tgi, uint offset, uint size, uint index) {
 			if (tgi == null) {
-				throw new Exception("Null TGI");
+				//throw new Exception("Null TGI");
+				_tgi = DBPFTGI.NULLTGI;
 			} else {
 				_tgi = tgi;
 			}
