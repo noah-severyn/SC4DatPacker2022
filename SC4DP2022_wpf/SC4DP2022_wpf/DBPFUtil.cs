@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 
 namespace SC4DP2022_wpf {
-	static class DBPFUtil {
+	public static class DBPFUtil {
 		private static readonly string[] sc4Extensions = { "dat", "sc4lot", "sc4desc", "sc4model" };
 
 
@@ -26,7 +26,6 @@ namespace SC4DP2022_wpf {
 				if (sc4Extensions.Any(extension.Contains)) { //https://stackoverflow.com/a/2912483/10802255
 					sc4Files.Add(file);
 					Trace.WriteLine(file);
-					Trace.WriteLine("   " + isDBPF(file));
 				}
 				else {
 					skippedFiles.Add(file);
@@ -37,17 +36,74 @@ namespace SC4DP2022_wpf {
 		}
 
 
-
-
-		//https://www.wiki.sc4devotion.com/index.php?title=DBPF
-		public static bool isDBPF(string filePath) { // [possibly rewrite using the Binary class??? https://docs.microsoft.com/en-us/dotnet/api/system.data.linq.binary?view=netframework-4.8
-			byte[] identifierFile = new byte[4];
-			byte[] identifierDbpf = new byte[] { 0x44, 0x42, 0x50, 0x46 };
-			FileStream fs = new FileStream(filePath, FileMode.Open);
-			BinaryReader reader = new BinaryReader(fs);
-			reader.BaseStream.Read(identifierFile, 0, 4);
-			fs.Close();
-			return identifierFile.SequenceEqual(identifierDbpf);
+		/// <summary>
+		/// Reverses the byte order for a uint. Example: 1697917002 (0x 65 34 28 4A) returns 1244148837 (0x 4A 28 34 65)
+		/// </summary>
+		/// <remarks>
+		/// See:https://stackoverflow.com/a/18145923/10802255
+		/// </remarks>
+		/// <param name="value">Integer value to reverse</param>
+		/// <returns></returns>
+		public static uint ReverseBytes(uint value) {
+			return (value & 0x000000FFU) << 24 | (value & 0x0000FF00U) << 8 | (value & 0x00FF0000U) >> 8 | (value & 0xFF000000U) >> 24;
 		}
+
+		/// <summary>
+		/// Returns a string representation of the provided uint converted to hex, padded by the specified number of places
+		/// </summary>
+		/// <param name="value">Value to return</param>
+		/// <param name="places">Number of places to pad the value. Should usually be 8. 0-8 valid.</param>
+		/// <returns></returns>
+		public static string UIntToHexString(uint? value, int places) {
+			if (places < 0 || places > 8) {
+				throw new ArgumentOutOfRangeException("places", "Number of places must be between 0 and 8.");
+			}
+			if (value != null) {
+				return ((uint) value).ToString($"X{places}");
+			} else {
+				return value.ToString();
+			}
+			
+		}
+
+
+		/// <summary>
+		/// Reads a byte array and returns a string of the entire array.
+		/// </summary>
+		/// <param name="data">Data to parse</param>
+		/// <returns>A string of parsed data</returns>
+		public static string CharsFromByteArray(byte[] data) {
+			return CharsFromByteArray(data, 0, data.Length);
+		}
+
+		/// <summary>
+		/// Reads a byte array and returns a string from the specified location to the end of the array.
+		/// </summary>
+		/// <param name="data">Data to parse</param>
+		/// <param name="start">Location to start parsing at</param>
+		/// <returns>A string of parsed data</returns>
+		public static string CharsFromByteArray(byte[] data, int start) {
+			return CharsFromByteArray(data, start, data.Length-start);
+		}
+
+		/// <summary>
+		/// Reads a byte array and returns a string from the specified location for a determined length.
+		/// </summary>
+		/// <param name="data">Data to parse</param>
+		/// <param name="start">Location to start parsing at</param>
+		/// <param name="length">Length of the provided data to parse</param>
+		/// <returns>A string of parsed data</returns>
+		public static string CharsFromByteArray(byte[] data, int start, int length) {
+			StringBuilder sb = new StringBuilder();
+			//for (int idx = 0; idx < length; idx++) {
+			//	sb.Append((char) data[start+idx]);
+			//}
+			for (int idx = start; idx < start+length; idx++) {
+				sb.Append((char) data[idx]);
+			}
+
+			return sb.ToString();
+		}
+
 	}
 }
