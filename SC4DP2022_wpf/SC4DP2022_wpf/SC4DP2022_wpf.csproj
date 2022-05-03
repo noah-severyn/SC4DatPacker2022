@@ -20,6 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="csDBPF">
+      <HintPath>..\..\..\csDBPF\csDBPF\csDBPF\obj\Debug\netcoreapp3.1\csDBPF.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="refresh_icon.png" />
     <Resource Include="settings_icon.png" />
   </ItemGroup>
